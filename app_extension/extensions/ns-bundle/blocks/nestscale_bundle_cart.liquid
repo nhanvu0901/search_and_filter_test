@@ -1,0 +1,46 @@
+<div id="nest-bundle-cart-page"></div>
+<button type="submit" form="cart" name="checkout" id="nb_check_out">Check out</button>
+<script>
+    if (!document.getElementById('nestscale-nestbundle-script')) {
+        let script = document.createElement('script')
+        script.type = 'text/javascript'
+        script.id = 'nestscale-nestbundle-script'
+        script.src = 'https://app.nestscale.com/nestbundle/static/js/shopify_frontend.js?v=20230829'
+        document.head.appendChild(script)
+    }
+</script>
+<style>
+    #nb_check_out {
+        width: 290px;
+        display: inline-flex;
+        justify-content: center;
+        align-items: center;
+        border: 0;
+        margin-right: 0;
+        margin-left: auto;
+        padding: 0 3rem;
+        cursor: pointer;
+        font: inherit;
+        font-size: 1.5rem;
+        text-decoration: none;
+        color: white;
+        transition: box-shadow 0.1s ease;
+        -webkit-appearance: none;
+        appearance: none;
+        background-color: black;
+        line-height: 3;
+        border-radius: 6px;
+    }
+</style>
+{% schema %}
+{
+  "name": "NestScale Bundle Cart",
+  "target": "section",
+  "enabled_on": {
+    "templates": [
+      "cart"
+    ]
+  },
+  "settings": []
+}
+{% endschema %}

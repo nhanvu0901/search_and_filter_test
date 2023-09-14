@@ -1,0 +1,6 @@
+node_modules
+.next
+package-lock.json
+__pycache__
+.env
+.shopify-cli.yml

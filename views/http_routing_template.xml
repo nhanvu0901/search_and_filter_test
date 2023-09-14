@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="nestscale_404" inherit_id="http_routing.404" name="Page Not Found">
+        <xpath expr="//t[@t-call='web.frontend_layout']" position="replace">
+            <div id="wrap">
+                <t t-out="0"/>
+                <div class="oe_structure oe_empty">
+                    <section class="s_text_image pt104 pb104" data-snippet="s_image_text" data-name="Image - Text">
+                        <div class="container">
+                            <div class="row align-items-center">
+                                <div style="margin: 40px auto 0 auto; text-align: center; font-family: sans-serif;">
+                                    <h2>This page could not be found!</h2>
+                                    <p>
+                                        We are sorry. But the page you are looking for is not available.
+                                        <br/>
+                                        Don't panic. If you think it's our mistake, please <a
+                                            href="mailto:support@nestscale.com">contact us</a>.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </xpath>
+    </template>
+
+    <template id="nestscale_400" inherit_id="http_routing.400">
+        <xpath expr="//t[@t-call='web.frontend_layout']" position="replace">
+            <div id="wrap">
+                <t t-out="0"/>
+                <h2 class="mt-5">Oops! Something went wrong. F5 to refresh or <a href="mailto:support@nestscale.com">
+                    contact
+                </a> with our support.
+                </h2>
+            </div>
+        </xpath>
+    </template>
+</odoo>
+
+
+

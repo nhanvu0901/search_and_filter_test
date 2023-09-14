@@ -1,0 +1,581 @@
+body {
+    width: 100% !important;
+}
+.main-container{
+
+}
+.ant-modal {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    color: rgba(0, 0, 0, 0.85);
+    font-size: 14px;
+    font-variant: tabular-nums;
+    line-height: 1.5715;
+    list-style: none;
+    font-feature-settings: 'tnum';
+    pointer-events: none;
+    position: relative;
+    top: 100px;
+    width: auto;
+    max-width: calc(100vw - 32px);
+    margin: 0 auto;
+    padding-bottom: 24px;
+}
+
+.ant-modal.ant-zoom-enter,
+.ant-modal.antzoom-appear {
+    transform: none;
+    opacity: 0;
+    animation-duration: 0.3s;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    user-select: none;
+}
+
+.ant-modal-mask {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 1000;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.45);
+}
+
+.ant-modal-mask-hidden {
+    display: none;
+}
+
+.ant-modal-wrap {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    overflow: auto;
+    outline: 0;
+    -webkit-overflow-scrolling: touch;
+}
+
+.ant-modal-wrap {
+    z-index: 1000;
+}
+
+.ant-modal-title {
+    margin: 0;
+    color: rgba(0, 0, 0, 0.85);
+    font-weight: 500;
+    font-size: 16px;
+    line-height: 22px;
+    word-wrap: break-word;
+}
+
+.ant-modal-content {
+    position: relative;
+    background-color: #fff;
+    background-clip: padding-box;
+    border: 0;
+    border-radius: 2px;
+    box-shadow: 0 3px 6px -4px rgba(0, 0, 0, 0.12), 0 6px 16px 0 rgba(0, 0, 0, 0.08), 0 9px 28px 8px rgba(0, 0, 0, 0.05);
+    pointer-events: auto;
+}
+
+.ant-modal-close {
+    position: absolute;
+    top: 0;
+    right: 0;
+    z-index: 10;
+    padding: 0;
+    color: rgba(0, 0, 0, 0.45);
+    font-weight: 700;
+    line-height: 1;
+    text-decoration: none;
+    background: transparent;
+    border: 0;
+    outline: 0;
+    cursor: pointer;
+    transition: color 0.3s;
+}
+
+.ant-modal-close-x {
+    display: block;
+    width: 56px;
+    height: 56px;
+    font-size: 16px;
+    font-style: normal;
+    line-height: 56px;
+    text-align: center;
+    text-transform: none;
+    text-rendering: auto;
+}
+
+.ant-modal-close:focus,
+.ant-modal-close:hover {
+    color: rgba(0, 0, 0, 0.75);
+    text-decoration: none;
+}
+
+.ant-modal-header {
+    padding: 16px 24px;
+    color: rgba(0, 0, 0, 0.85);
+    background: #fff;
+    border-bottom: 1px solid #f0f0f0;
+    border-radius: 2px 2px 0 0;
+}
+
+.ant-modal-body {
+    padding: 24px;
+    font-size: 14px;
+    line-height: 1.5715;
+    word-wrap: break-word;
+}
+
+.ant-modal-footer {
+    padding: 10px 16px;
+    text-align: right;
+    background: transparent;
+    border-top: 1px solid #f0f0f0;
+    border-radius: 0 0 2px 2px;
+}
+
+.ant-modal-footer .ant-btn + .ant-btn:not(.ant-dropdown-trigger) {
+    margin-bottom: 0;
+    margin-left: 8px;
+}
+
+.ant-modal-open {
+    overflow: hidden;
+}
+
+.ant-modal-centered {
+    text-align: center;
+}
+
+.ant-modal-centered::before {
+    display: inline-block;
+    width: 0;
+    height: 100%;
+    vertical-align: middle;
+    content: '';
+}
+
+.ant-modal-centered .ant-modal {
+    top: 0;
+    display: inline-block;
+    padding-bottom: 0;
+    text-align: left;
+    vertical-align: middle;
+}
+
+@media (max-width: 767px) {
+    .ant-modal {
+        max-width: calc(100vw - 16px);
+        margin: 8px auto;
+    }
+
+    .ant-modal-centered .ant-modal {
+        flex: 1;
+    }
+}
+
+.ant-modal-confirm .ant-modal-header {
+    display: none;
+}
+
+.ant-modal-confirm .ant-modal-body {
+    padding: 32px 32px 24px;
+}
+
+.ant-modal-confirm-body-wrapper::before {
+    display: table;
+    content: '';
+}
+
+.ant-modal-confirm-body-wrapper::after {
+    display: table;
+    clear: both;
+    content: '';
+}
+
+.ant-modal-confirm-body .ant-modal-confirm-title {
+    display: block;
+    overflow: hidden;
+    color: rgba(0, 0, 0, 0.85);
+    font-weight: 500;
+    font-size: 16px;
+    line-height: 1.4;
+}
+
+.ant-modal-confirm-body .ant-modal-confirm-content {
+    margin-top: 8px;
+    color: rgba(0, 0, 0, 0.85);
+    font-size: 14px;
+}
+
+.ant-modal-confirm-body > .anticon {
+    float: left;
+    margin-right: 16px;
+    font-size: 22px;
+}
+
+.ant-modal-confirm-body > .anticon + .ant-modal-confirm-title + .ant-modal-confirm-content {
+    margin-left: 38px;
+}
+
+.ant-modal-confirm .ant-modal-confirm-btns {
+    float: right;
+    margin-top: 24px;
+}
+
+.ant-modal-confirm .ant-modal-confirm-btns .ant-btn + .ant-btn {
+    margin-bottom: 0;
+    margin-left: 8px;
+}
+
+.ant-modal-confirm-error .ant-modal-confirm-body > .anticon {
+    color: #ff4d4f;
+}
+
+.ant-modal-confirm-warning .ant-modal-confirm-body > .anticon,
+.ant-modal-confirm-confirm .ant-modal-confirm-body > .anticon {
+    color: #faad14;
+}
+
+.ant-modal-confirm-info .ant-modal-confirm-body > .anticon {
+    color: #1890ff;
+}
+
+.ant-modal-confirm-success .ant-modal-confirm-body > .anticon {
+    color: #52c41a;
+}
+
+.ant-modal-wrap-rtl {
+    direction: rtl;
+}
+
+.ant-modal-wrap-rtl .ant-modal-close {
+    right: initial;
+    left: 0;
+}
+
+.ant-modal-wrap-rtl .ant-modal-footer {
+    text-align: left;
+}
+
+.ant-modal-wrap-rtl .ant-modal-footer .ant-btn + .ant-btn {
+    margin-right: 8px;
+    margin-left: 0;
+}
+
+.ant-modal-wrap-rtl .ant-modal-confirm-body {
+    direction: rtl;
+}
+
+.ant-modal-wrap-rtl .ant-modal-confirm-body > .anticon {
+    float: right;
+    margin-right: 0;
+    margin-left: 16px;
+}
+
+.ant-modal-wrap-rtl .ant-modal-confirm-body > .anticon + .ant-modal-confirm-title + .ant-modal-confirm-content {
+    margin-right: 38px;
+    margin-left: 0;
+}
+
+.ant-modal-wrap-rtl .ant-modal-confirm-btns {
+    float: left;
+}
+
+.ant-modal-wrap-rtl .ant-modal-confirm-btns .ant-btn + .ant-btn {
+    margin-right: 8px;
+    margin-left: 0;
+}
+
+.ant-modal-wrap-rtl.ant-modal-centered .ant-modal {
+    text-align: right;
+}
+
+/*notification*/
+
+.ant-notification {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    color: rgba(0, 0, 0, 0.85);
+    font-size: 14px;
+    font-variant: tabular-nums;
+    line-height: 1.5715;
+    list-style: none;
+    font-feature-settings: 'tnum';
+    position: fixed;
+    z-index: 1010;
+    margin-right: 24px;
+}
+
+.ant-notification-topLeft,
+.ant-notification-bottomLeft {
+    margin-right: 0;
+    margin-left: 24px;
+}
+
+.ant-notification-topLeft .ant-notification-fade-enter.ant-notification-fade-enter-active,
+.ant-notification-bottomLeft .ant-notification-fade-enter.ant-notification-fade-enter-active,
+.ant-notification-topLeft .ant-notification-fade-appear.ant-notification-fade-appear-active,
+.ant-notification-bottomLeft .ant-notification-fade-appear.ant-notification-fade-appear-active {
+    animation-name: NotificationLeftFadeIn;
+}
+
+.ant-notification-close-icon {
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.ant-notification-hook-holder {
+    position: relative;
+}
+
+.ant-notification-notice {
+    position: relative;
+    width: 384px;
+    max-width: calc(100vw - 24px * 2);
+    margin-bottom: 16px;
+    margin-left: auto;
+    padding: 16px 24px;
+    overflow: hidden;
+    line-height: 1.5715;
+    word-wrap: break-word;
+    background: #fff;
+    border-radius: 2px;
+    box-shadow: 0 3px 6px -4px rgba(0, 0, 0, 0.12), 0 6px 16px 0 rgba(0, 0, 0, 0.08), 0 9px 28px 8px rgba(0, 0, 0, 0.05);
+}
+
+.ant-notification-topLeft .ant-notification-notice,
+.ant-notification-bottomLeft .ant-notification-notice {
+    margin-right: auto;
+    margin-left: 0;
+}
+
+.ant-notification-notice-message {
+    margin-bottom: 8px;
+    color: rgba(0, 0, 0, 0.85);
+    font-size: 16px;
+    line-height: 24px;
+}
+
+.ant-notification-notice-message-single-line-auto-margin {
+    display: block;
+    width: calc(384px - 24px * 2 - 24px - 48px - 100%);
+    max-width: 4px;
+    background-color: transparent;
+    pointer-events: none;
+}
+
+.ant-notification-notice-message-single-line-auto-margin::before {
+    display: block;
+    content: '';
+}
+
+.ant-notification-notice-description {
+    font-size: 14px;
+}
+
+.ant-notification-notice-closable .ant-notification-notice-message {
+    padding-right: 24px;
+}
+
+.ant-notification-notice-with-icon .ant-notification-notice-message {
+    margin-bottom: 4px;
+    margin-left: 48px;
+    font-size: 16px;
+}
+
+.ant-notification-notice-with-icon .ant-notification-notice-description {
+    margin-left: 48px;
+    font-size: 14px;
+}
+
+.ant-notification-notice-icon {
+    position: absolute;
+    margin-left: 4px;
+    font-size: 24px;
+    line-height: 24px;
+}
+
+.anticon.ant-notification-notice-icon-success {
+    color: #52c41a;
+}
+
+.anticon.ant-notification-notice-icon-info {
+    color: #1890ff;
+}
+
+.anticon.ant-notification-notice-icon-warning {
+    color: #faad14;
+}
+
+.anticon.ant-notification-notice-icon-error {
+    color: #ff4d4f;
+}
+
+.ant-notification-notice-close {
+    position: absolute;
+    top: 16px;
+    right: 22px;
+    color: rgba(0, 0, 0, 0.45);
+    outline: none;
+}
+
+.ant-notification-notice-close:hover {
+    color: rgba(0, 0, 0, 0.67);
+}
+
+.ant-notification-notice-btn {
+    float: right;
+    margin-top: 16px;
+}
+
+.ant-notification .notification-fade-effect {
+    animation-duration: 0.24s;
+    animation-timing-function: cubic-bezier(0.645, 0.045, 0.355, 1);
+    animation-fill-mode: both;
+}
+
+.ant-notification-fade-enter,
+.ant-notification-fade-appear {
+    animation-duration: 0.24s;
+    animation-timing-function: cubic-bezier(0.645, 0.045, 0.355, 1);
+    animation-fill-mode: both;
+    opacity: 0;
+    animation-play-state: paused;
+}
+
+.ant-notification-fade-leave {
+    animation-duration: 0.24s;
+    animation-timing-function: cubic-bezier(0.645, 0.045, 0.355, 1);
+    animation-fill-mode: both;
+    animation-duration: 0.2s;
+    animation-play-state: paused;
+}
+
+.ant-notification-fade-enter.ant-notification-fade-enter-active,
+.ant-notification-fade-appear.ant-notification-fade-appear-active {
+    animation-name: NotificationFadeIn;
+    animation-play-state: running;
+}
+
+.ant-notification-fade-leave.ant-notification-fade-leave-active {
+    animation-name: NotificationFadeOut;
+    animation-play-state: running;
+}
+
+@keyframes NotificationFadeIn {
+    0% {
+        left: 384px;
+        opacity: 0;
+    }
+    100% {
+        left: 0;
+        opacity: 1;
+    }
+}
+
+@keyframes NotificationLeftFadeIn {
+    0% {
+        right: 384px;
+        opacity: 0;
+    }
+    100% {
+        right: 0;
+        opacity: 1;
+    }
+}
+
+@keyframes NotificationFadeOut {
+    0% {
+        max-height: 150px;
+        margin-bottom: 16px;
+        opacity: 1;
+    }
+    100% {
+        max-height: 0;
+        margin-bottom: 0;
+        padding-top: 0;
+        padding-bottom: 0;
+        opacity: 0;
+    }
+}
+
+.ant-notification-rtl {
+    direction: rtl;
+}
+
+.ant-notification-rtl .ant-notification-notice-closable .ant-notification-notice-message {
+    padding-right: 0;
+    padding-left: 24px;
+}
+
+.ant-notification-rtl .ant-notification-notice-with-icon .ant-notification-notice-message {
+    margin-right: 48px;
+    margin-left: 0;
+}
+
+.ant-notification-rtl .ant-notification-notice-with-icon .ant-notification-notice-description {
+    margin-right: 48px;
+    margin-left: 0;
+}
+
+.ant-notification-rtl .ant-notification-notice-icon {
+    margin-right: 4px;
+    margin-left: 0;
+}
+
+.ant-notification-rtl .ant-notification-notice-close {
+    right: auto;
+    left: 22px;
+}
+
+.ant-notification-rtl .ant-notification-notice-btn {
+    float: left;
+}
+
+/*a tag*/
+a {
+    color: #1890ff;
+    text-decoration: none;
+    background-color: transparent;
+    outline: none;
+    cursor: pointer;
+    transition: color 0.3s;
+    -webkit-text-decoration-skip: objects;
+}
+
+a:hover {
+    color: #40a9ff;
+}
+
+a:active {
+    color: #096dd9;
+}
+
+a:active,
+a:hover {
+    text-decoration: none;
+    outline: 0;
+}
+
+a:focus {
+    text-decoration: none;
+    outline: 0;
+}
+
+a[disabled] {
+    color: rgba(0, 0, 0, 0.25);
+    cursor: not-allowed;
+}
+
+/*bonus*/
+.ant-modal-wrap.full-modal {
+    overflow-x: hidden;
+}

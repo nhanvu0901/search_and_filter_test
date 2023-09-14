@@ -1,0 +1,75 @@
+<odoo>
+    <data>
+        <!-- actions opening views on models -->
+
+        <record model="ir.actions.act_window" id="nb_bundle_action_window">
+            <field name="name">Bundle</field>
+            <field name="res_model">nb.bundle</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+
+        <record model="ir.actions.act_window" id="nb_bundle_design_action_window">
+            <field name="name">Bundle Design</field>
+            <field name="res_model">nb.bundle.design</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <record model="ir.actions.act_window" id="nb_bundle_analytic_action_window">
+            <field name="name">Bundle Analytic</field>
+            <field name="res_model">nb.bundle.analytic</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+
+        <record model="ir.actions.act_window" id="nb_shopify_store_action_window">
+            <field name="name">Shopify Store</field>
+            <field name="res_model">nb.shopify.store</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <record model="ir.actions.act_window" id="nb_webhook_log">
+            <field name="name">Webhook Log</field>
+            <field name="res_model">nb.webhook.log</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+
+        <record id="view_nest_bundle_shopify_store_form" model="ir.ui.view">
+            <field name="name">nb.shopify.store.form</field>
+            <field name="model">nb.shopify.store</field>
+            <field name="arch" type="xml">
+                <form string="Shopify Store">
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="name"/>
+                                <field name="email"/>
+                                <field name="store_url"/>
+                                <field name="install_status"/>
+                                <field name="timezone"/>
+                                <field name="shopify_access_token"/>
+                            </group>
+                            <group>
+                                <field name="shop_id"/>
+                                <field name="currency"/>
+                                <field name="primary_domain"/>
+
+                                <field name="script_tag_updated"/>
+                                <field name="webhook_ids"/>
+                                <field name="bundle"/>
+
+<!--                                <div class="content-group">-->
+<!--                                    <div class="row mt16">-->
+<!--                                        <button name="updating_script_tag" string="Update Script Tag" type="object"-->
+<!--                                                icon="fa-refresh text-primary"/>-->
+<!--                                    </div>-->
+<!--                                </div>-->
+                            </group>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+    </data>
+</odoo>

@@ -1,0 +1,23 @@
+<odoo>
+    <data>
+        <menuitem name="NestBundle" id="nest_bundle_menu_root"/>
+
+        <menuitem name="Shopify Store" id="nest_bundle_menu_shopify_store" parent="nest_bundle_menu_root"
+                  action="nb_shopify_store_action_window" sequence="1"/>
+
+        <menuitem name="Bundle" id="nest_bundle_menu_bundle" parent="nest_bundle_menu_root"
+                  action="nb_bundle_action_window" sequence="2"/>
+
+        <menuitem name="Bundle Design" id="nest_bundle_menu_bundle_design" parent="nest_bundle_menu_root"
+                  action="nb_bundle_design_action_window" sequence="3"/>
+
+
+        <menuitem name="Bundle Analytic" id="nest_bundle_bundle_analytic" parent="nest_bundle_menu_root"
+                  action="nb_bundle_analytic_action_window" sequence="4"/>
+
+        <menuitem name="Bundle Webhook Log" id="nest_bundle_bundle_webhook_log" parent="nest_bundle_menu_root"
+                  action="nb_webhook_log" sequence="5"/>
+
+
+    </data>
+</odoo>

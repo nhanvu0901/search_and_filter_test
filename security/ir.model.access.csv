@@ -1,0 +1,6 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_nb_shopify_store,nb_shopify_store,model_nb_shopify_store,base.group_system,1,1,1,1
+access_nb_bundle,nb_bundle,model_nb_bundle,base.group_system,1,1,1,1
+access_nb_bundle_analytic,nb_bundle_analytic,model_nb_bundle_analytic,base.group_system,1,1,1,1
+access_nb_bundle_design,nb_bundle_design,model_nb_bundle_design,base.group_system,1,1,1,1
+access_nb_webhook_log,nb_webhook_log,model_nb_webhook_log,base.group_system,1,1,1,1

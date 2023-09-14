@@ -1,0 +1,22 @@
+<div class="nest-bundle-product-page"></div>
+<script>
+    if (!document.getElementById('nestscale-nestbundle-script')) {
+        let script = document.createElement('script')
+        script.type = 'text/javascript'
+        script.id = 'nestscale-nestbundle-script'
+        script.src = 'https://app.nestscale.com/nestbundle/static/js/shopify_frontend.js?v=20230829'
+        document.head.appendChild(script)
+    }
+</script>
+{% schema %}
+{
+  "name": "NestScale Bundle Product",
+  "target": "section",
+  "enabled_on": {
+    "templates": [
+      "product"
+    ]
+  },
+  "settings": []
+}
+{% endschema %}

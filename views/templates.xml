@@ -1,0 +1,41 @@
+<odoo>
+    <data>
+        <template id="nestbundle_redirect" name="Shopify URL Redirect">
+            <script>
+                window.top.location.href = '<t t-raw="url"/>';
+            </script>
+        </template>
+
+        <template id="nestscale_app_admin_login" name="Admin Login">
+            <form action="/internal/auth">
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username"/>
+                <br/>
+                <br/>
+                <label for="pwd">Password</label>
+                <input type="password" id="pwd" name="password"/>
+                <br/>
+                <br/>
+                <input type="submit" value="Login"/>
+            </form>
+        </template>
+
+        <template id="nestbundle_index">
+            &lt;!DOCTYPE html&gt;
+            <head>
+                <title>Nestbundle</title>
+                <link rel="shortcut icon" sizes="196x196" href="/nestbundle/static/img/nesbundle-logo.png"/>
+                <meta name="viewport" content="width=device-width"/>
+            </head>
+            <div id="nestbundle-app"/>
+            <script>
+                window.nb_settings = <t t-raw="nb_settings"/>;
+                window.nb_current_time = <t t-raw="nb_password_master"/>;
+                nest_bundle = {}
+            </script>
+            <!--            <script src="/nestbundle/static/js/index.js"/>-->
+            <!---->
+            <t t-call-assets="nestbundle.nb_js_package_assets"/>
+        </template>
+    </data>
+</odoo>
