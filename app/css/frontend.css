@@ -1,9 +1,26 @@
 body {
     width: 100% !important;
 }
-.main-container{
 
+.main-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    width: 100%;
 }
+.filter-option{
+    border-bottom: 2px solid grey;
+}
+.dropdown-value {
+    height: 200px;
+    overflow-y: scroll;
+}
+
+.filter-tree {
+    cursor: pointer;
+    width: 200px
+}
+
 .ant-modal {
     box-sizing: border-box;
     margin: 0;

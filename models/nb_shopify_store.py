@@ -43,7 +43,7 @@ class NestBundleShopifyStore(models.Model):
     primary_locale = fields.Char()
     country = fields.Char()
     product_list = fields.Char()
-    filter = fields.Char()
+    filter_option = fields.Char()
 
     def register_webhook(self):
         try:

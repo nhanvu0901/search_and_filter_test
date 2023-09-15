@@ -58,13 +58,15 @@
                                 <field name="script_tag_updated"/>
                                 <field name="webhook_ids"/>
                                 <field name="bundle"/>
+                                <field name="product_list"/>
+                                <field name="filter_option"/>
 
-<!--                                <div class="content-group">-->
-<!--                                    <div class="row mt16">-->
-<!--                                        <button name="updating_script_tag" string="Update Script Tag" type="object"-->
-<!--                                                icon="fa-refresh text-primary"/>-->
-<!--                                    </div>-->
-<!--                                </div>-->
+                                <!--                                <div class="content-group">-->
+                                <!--                                    <div class="row mt16">-->
+                                <!--                                        <button name="updating_script_tag" string="Update Script Tag" type="object"-->
+                                <!--                                                icon="fa-refresh text-primary"/>-->
+                                <!--                                    </div>-->
+                                <!--                                </div>-->
                             </group>
                         </group>
                     </sheet>

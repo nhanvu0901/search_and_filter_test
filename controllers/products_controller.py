@@ -10,6 +10,7 @@ from urllib import parse
 import time
 from .auth import verify_request
 from .auth import verify_app_proxy_request
+
 _logger = logging.getLogger(__name__)
 
 list_collections = []
@@ -62,7 +63,7 @@ class NestBundleProductController(http.Controller):
                                               'pageInfo {hasNextPage}'
                                               'edges {cursor node {id title '
                                               'collections(first: 5) { edges { node {id title }}}'
-                                              'options(first: 5) { id name values } '
+                                              'options(first: 4) { id name values } '
                                               'variants(first: 5) { edges { node {availableForSale compareAtPrice price title image {url} }}}'
                                               ' title createdAt productType tags vendor images(first: 1) {edges { node {originalSrc}}}}}}}') % (
                                               limit, search_query)
@@ -147,7 +148,7 @@ class NestBundleProductController(http.Controller):
                                             "created_at": data['createdAt'],
                                             'id': data['id'].split("/")[-1],
                                             'img_src': data['images']['edges'][0]['node'][
-                                                'originalSrc'] if 'edges' in data else None,
+                                                'originalSrc'] if 'images' in data else None,
                                             "options": [obj.get('node') for obj in data['options']],
                                             "product_type": data['productType'],
                                             'title': data['title'],
@@ -190,13 +191,13 @@ class NestBundleProductController(http.Controller):
                                            'Checkbox')
                 self.append_filter_options(list_price_range, filter_options, 'price', True, False, False, 0, 5,
                                            'Slider')
-                self.append_filter_options(list_percent_sale, filter_options, 'percent sale"', True, False, False, 0, 6,
+                self.append_filter_options(list_percent_sale, filter_options, 'percent sale', True, False, False, 0, 6,
                                            'Slider')
                 end_time = time.time()
                 elapsed_time = end_time - start_time
                 print(f"Elapsed time: {elapsed_time} seconds")
                 current_store.product_list = json.dumps(product_list)
-                current_store.filter = json.dumps(filter_options)
+                current_store.filter_option = json.dumps(filter_options)
 
                 shopify.ShopifyResource.clear_session()
 
@@ -309,5 +310,31 @@ class NestBundleProductController(http.Controller):
 
     @http.route('/nb/get_product', auth='public', type='json', method=['POST'], csrf=False, cors="*")
     def get_product(self, **kw):
-        verify_app_proxy_request()
-        print(kw['search_query_product'])
+
+        current_store = request.env['nb.shopify.store'].sudo().search(
+            [("store_url", '=', kw['store_url'])], limit=1)
+        pagnition = {}
+        last_page = math.ceil(len(json.loads(current_store.product_list)) / 12)
+        product_list = None
+        if type(kw['query']) == int:
+            pagnition = {
+                'current_page':kw['query'],
+                'from': kw['query'],
+                'hasMorePages': True if last_page - kw['query'] > 0 else False,
+                'last_page': last_page,
+                'per_page': 12,
+                'total': len(json.dumps(current_store.product_list)),
+            }
+            product_list = json.dumps(json.loads(current_store.product_list)[:12])
+        else:
+            product_list = list(filter(lambda x: x['age'] > 25, json.loads(current_store.product_list)))
+
+
+        if current_store:
+            return {
+                'code': 0,
+                'filter_options': current_store.filter_option,
+                'pagnition': pagnition,
+                "product_list":product_list,
+                "is_mounted": True if kw['is_mounted'] == True else False
+            }

@@ -17,6 +17,7 @@ if (window.location.href.includes('/collections/')) {
     collection.id = "nest-something-id"
     collection.style.display = 'flex'
     collection.style.justifyContent = 'center'
+    collection.style.width = "100%"
     MainFrame.appendChild(collection)
     if (collection) {
         createApp({
