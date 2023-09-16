@@ -278,21 +278,41 @@ class NestBundleProductController(http.Controller):
             if query:
                 if 'data' in query:
                     if 'shop' in query['data'] and options in query['data']['shop']:
-                        for option in query['data']['shop'][options]['edges']:
-                            if options == 'collections':
-                                if option['node']['productsCount'] > 0:
-                                    list_options.append({
-                                        "count": option['node']['productsCount'],
-                                        "label": option['node']['title'],
-                                    })
-                            else:
-                                list_options.append({
-                                    "label": option['node'],
-                                    "count": 0,
-                                })
+                        if len(query['data']['shop'][options]['edges']) > 1:
+                            for option in query['data']['shop'][options]['edges']:
+                                self.append_list_options(options, option, list_options)
+                        else:
+                            self.append_list_options(options, query['data']['shop'][options]['edges'][0], list_options)
             if query['data']['shop'][options]['pageInfo']['hasNextPage'] == False:
                 break
         return list_options
+
+    def append_list_options(self, options, option, list_options):
+        if options == 'collections':
+            if option['node']['productsCount'] > 0:
+                list_options.append({
+                    "count": option['node']['productsCount'],
+                    "label": option['node']['title'],
+                })
+        else:
+            list_options.append({
+                "label": option['node'],
+                "count": 0,
+            })
+
+
+    def append_list_options(self,options,option,list_options):
+        if options == 'collections':
+            if option['node']['productsCount'] > 0:
+                list_options.append({
+                    "count": option['node']['productsCount'],
+                    "label": option['node']['title'],
+                })
+        else:
+            list_options.append({
+                "label": option['node'],
+                "count": 0,
+            })
 
     def append_filter_options(self, options, filter_options, atribute, is_collapse, is_form_filter, is_selected, label,
                               position, style):
@@ -313,27 +333,35 @@ class NestBundleProductController(http.Controller):
 
         current_store = request.env['nb.shopify.store'].sudo().search(
             [("store_url", '=', kw['store_url'])], limit=1)
-        pagnition = {}
-        last_page = math.ceil(len(json.loads(current_store.product_list)) / 12)
+        has_more_page= None
+
         product_list = None
         if type(kw['query']) == int:
-            pagnition = {
-                'current_page':kw['query'],
-                'from': kw['query'],
-                'hasMorePages': True if last_page - kw['query'] > 0 else False,
-                'last_page': last_page,
-                'per_page': 12,
-                'total': len(json.dumps(current_store.product_list)),
-            }
             product_list = json.dumps(json.loads(current_store.product_list)[:12])
+            last_page = math.ceil(len(json.loads(current_store.product_list)) / 12)
+            has_more_page = True if last_page - kw['query'] > 0 else False
+
         else:
-            product_list = list(filter(lambda x: x['age'] > 25, json.loads(current_store.product_list)))
+            product_list = list(filter(lambda x: x[kw['query']['option']] == kw['query']['value']['label'], json.loads(current_store.product_list)))
+            last_page = math.ceil(len(product_list) / 12)
+            product_list = json.dumps(product_list[:12])
+
+            has_more_page = True if last_page - kw['query']['pagnition'] > 0 else False
 
 
+
+        pagnition = {
+            'current_page': kw['query'],
+            'from': kw['query'],
+            'hasMorePages': has_more_page,
+            'last_page': last_page,
+            'per_page': 12,
+            'total': len(json.dumps(current_store.product_list)),
+        }
         if current_store:
             return {
                 'code': 0,
-                'filter_options': current_store.filter_option,
+                'filter_options': current_store.filter_option if kw['is_mounted'] is True else '',
                 'pagnition': pagnition,
                 "product_list":product_list,
                 "is_mounted": True if kw['is_mounted'] == True else False

@@ -31,7 +31,11 @@ export default {
             search_query_product: '',
             filter_options: null,
             product_list: null,
-            query:1
+            query:{
+              option:'',
+              value:'',
+              pagnition:0
+            }
         }
     },
     methods: {
@@ -57,12 +61,14 @@ export default {
                 }).then(res => {
                     if (res.data.result.code === 0) {
                         let data = res.data.result
-                        console.log(JSON.parse(data.filter_options))
-                        console.log(data.pagnition)
-                        console.log(JSON.parse(data.product_list))
+
+
                         if(data.is_mounted){
                              self.filter_options = JSON.parse(data.filter_options)
                         }
+
+                        console.log(data.pagnition)
+                        console.log(JSON.parse(data.product_list))
                         self.product_list = JSON.parse(data.product_list)
                     } else {
                     }
@@ -73,6 +79,7 @@ export default {
     },
     mounted() {
         let is_mounted = true
+        this.query =1
         this.getProductList(is_mounted)
     }
 }

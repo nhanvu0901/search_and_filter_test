@@ -4,7 +4,7 @@
         <div class="dropdown-value">
 
             <div v-if="option.is_selected === true" v-for="(value,index) in option.values"
-                 @click="select_filter(option,value)">
+                 @click="select_filter(option.attribute,value)">
                 {{ value.is_selected !== false && value.is_selected !== undefined ? "!" : '' }} {{ value.label }}
                 ({{ value.count }})
             </div>
@@ -40,7 +40,7 @@ export default {
         select_filter(option, value) {
             this.selected_filter.push(value)
             value.is_selected = !value.is_selected
-            this.$emit('setChooseFilter', {option: option,value:value});
+            this.$emit('setChooseFilter', {option: option,value:value,pagnition:1});
         }
     },
     mounted() {
