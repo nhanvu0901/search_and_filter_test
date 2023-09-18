@@ -1,11 +1,15 @@
 <template>
-  <div class="product-grid-container">
-    <div v-for="product in product_list">
-      <img  :src="product.img_src" sizes="(min-width: 1200px) 267px, (min-width: 990px) calc((100vw - 130px) / 4), (min-width: 750px) calc((100vw - 120px) / 3), calc((100vw - 35px) / 2)">
-      <div>{{ product.title }}</div>
-      <div>{{ returnProductPrice(product.variants) }} {{ currency }}</div>
+    <div class="product-grid-container">
+        <div v-for="product in product_list">
+            <a :href="'/products/' + product.handle + (product.variants.length > 0 ? '?variant=' + returnVariant(product.variants).id : '')">
+                <div class="zoom-container">
+                    <img :src="product.img_src">
+                </div>
+                <div>{{ product.title }}</div>
+                <div>{{ returnVariant(product.variants).price }} {{ currency }}</div>
+            </a>
+        </div>
     </div>
-  </div>
 </template>
 <script setup>
 
@@ -14,34 +18,34 @@
 
 
 export default {
-  name: "ProductGrid",
-  emits: [],
-  props: {
-    product_list: Array
+    name: "ProductGrid",
+    emits: [],
+    props: {
+        product_list: Array
 
-  },
-  data() {
-    return {
-      currency: null
-    }
-  },
-  methods: {
-    returnProductPrice(variants) {
-      if (variants.length > 1) {
-        for (let item of variants) {
-          if (item.price !== null) {
-            return item.price
-          }
+    },
+    data() {
+        return {
+            currency: null
         }
-      } else {
-        return variants[0].price
-      }
+    },
+    methods: {
+        returnVariant(variants) {
+            if (variants.length > 1) {
+                for (let item of variants) {
+                    if (item.price !== null) {
+                        return item
+                    }
+                }
+            } else {
+                return variants[0]
+            }
+        }
+    },
+
+    mounted() {
+        this.currency = Shopify.currency.active
+
     }
-  },
-
-  mounted() {
-    this.currency =Shopify.currency.active
-
-  }
 }
 </script>

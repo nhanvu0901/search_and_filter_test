@@ -40,7 +40,10 @@ export default {
         select_filter(option, value) {
             this.selected_filter.push(value)
             value.is_selected = !value.is_selected
-            this.$emit('setChooseFilter', {option: option,value:value,pagnition:1});
+            if(!value.is_selected){
+                value = ''
+            }
+            this.$emit('setChooseFilter', {option: option,value:value,pagination:1});
         }
     },
     mounted() {

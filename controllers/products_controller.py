@@ -53,19 +53,19 @@ class NestBundleProductController(http.Controller):
                     query = ('{products(first: %d, query: "title:%s* AND status:ACTIVE" after:"%s" ) {'
                              'pageInfo {hasNextPage}'
                              'edges {cursor node {id title '
-                             'collections(first: 5) { edges { node {id title }}} '
+                             'collections(first: 5) { nodes {title}}'
                              'options(first: 5) { id name values } '
-                             'variants(first: 5) { edges { node {availableForSale compareAtPrice price title image {url} }}}'
-                             ' title createdAt productType tags vendor images(first: 1) {edges { node {originalSrc}}} }}}}') % (
+                             'variants(first: 5) { nodes {id availableForSale compareAtPrice price title image {url} }}'
+                             ' title handle createdAt productType tags vendor images(first: 1) {edges { node {originalSrc}}} }}}}') % (
                                 limit, search_query, last_element) \
                         if loop != 0 else (
                                               '{products(first: %d, query: "title:%s* AND status:ACTIVE") {'
                                               'pageInfo {hasNextPage}'
                                               'edges {cursor node {id title '
-                                              'collections(first: 5) { edges { node {id title }}}'
+                                              'collections(first: 5) { nodes  {title}}'
                                               'options(first: 4) { id name values } '
-                                              'variants(first: 5) { edges { node {availableForSale compareAtPrice price title image {url} }}}'
-                                              ' title createdAt productType tags vendor images(first: 1) {edges { node {originalSrc}}}}}}}') % (
+                                              'variants(first: 5) { nodes {id availableForSale compareAtPrice price title image {url} }}'
+                                              ' title handle createdAt productType tags vendor images(first: 1) {edges { node {originalSrc}}}}}}}') % (
                                               limit, search_query)
 
                     query_result = shopify.GraphQL().execute(query=query)
@@ -109,11 +109,10 @@ class NestBundleProductController(http.Controller):
                                             })
                                         variant_list = []
                                         not_available = 0
-                                        for variant in data['variants'].get('edges'):
-                                            data_variant = variant.get('node')
+                                        for data_variant in data['variants'].get('nodes'):
                                             variant_data = {
                                                 "available": data_variant.get("availableForSale"),
-                                                # "id": data_variant['id'].split('/')[-1],
+                                                "id": data_variant['id'].split('/')[-1],
                                                 # "inventory_policy": data_variant.get("inventoryPolicy"),
                                                 "compare_at_price": data_variant.get("compareAtPrice"),
                                                 'price': float(data_variant.get('price')),
@@ -144,14 +143,15 @@ class NestBundleProductController(http.Controller):
                                             variant_list.append(variant_data)
                                         product_options.append({
                                             "available": False if not_available == len(variant_list) else True,
-                                            "collections": data['collections']['edges'],
+                                            "collections": data['collections']['nodes'],
                                             "created_at": data['createdAt'],
                                             'id': data['id'].split("/")[-1],
                                             'img_src': data['images']['edges'][0]['node'][
                                                 'originalSrc'] if 'images' in data else None,
-                                            "options": [obj.get('node') for obj in data['options']],
+                                            "options": data['options'],
                                             "product_type": data['productType'],
                                             'title': data['title'],
+                                            "handle": data['handle'],
                                             # 'product_url': data['onlineStorePreviewUrl'],
                                             "tags": data['tags'],
                                             "variants": variant_list,
@@ -179,7 +179,7 @@ class NestBundleProductController(http.Controller):
                 list_price_range['max'] = max_price
                 list_percent_sale['min'] = min_percent_sale
                 list_percent_sale['max'] = max_percent_sale
-                self.append_filter_options(list_collections, filter_options, 'collection', True, False, False, 0, 0,
+                self.append_filter_options(list_collections, filter_options, 'collections', True, False, False, 0, 0,
                                            'Checkbox')
                 self.append_filter_options(list_vendors, filter_options, 'vendor', True, False, False, 0, 1,
                                            'Checkbox')
@@ -187,7 +187,7 @@ class NestBundleProductController(http.Controller):
                                            'Checkbox')
                 self.append_filter_options(list_availability, filter_options, 'availability', True, False, False, 0, 3,
                                            'Checkbox')
-                self.append_filter_options(list_tags, filter_options, 'tag', True, False, False, 0, 4,
+                self.append_filter_options(list_tags, filter_options, 'tags', True, False, False, 0, 4,
                                            'Checkbox')
                 self.append_filter_options(list_price_range, filter_options, 'price', True, False, False, 0, 5,
                                            'Slider')
@@ -250,7 +250,7 @@ class NestBundleProductController(http.Controller):
             else:
                 string_after = ''
             if options == 'collections':
-                query_params = '{' + options + '(first: 100' + string_after + ') {pageInfo {hasNextPage} edges {cursor node { id productsCount title}} }}'
+                query_params = '{' + options + '(first: 100' + string_after + ') {pageInfo {hasNextPage} edges {cursor node { productsCount title}} }}'
             elif options == 'productVendors' or options == 'productTypes' or options == 'productTags':
                 query_params = '{' + options + '(first: 100' + string_after + ') {pageInfo {hasNextPage} edges {cursor node }}}'
             elif options == "availability":
@@ -300,8 +300,7 @@ class NestBundleProductController(http.Controller):
                 "count": 0,
             })
 
-
-    def append_list_options(self,options,option,list_options):
+    def append_list_options(self, options, option, list_options):
         if options == 'collections':
             if option['node']['productsCount'] > 0:
                 list_options.append({
@@ -314,10 +313,10 @@ class NestBundleProductController(http.Controller):
                 "count": 0,
             })
 
-    def append_filter_options(self, options, filter_options, atribute, is_collapse, is_form_filter, is_selected, label,
+    def append_filter_options(self, options, filter_options, attribute, is_collapse, is_form_filter, is_selected, label,
                               position, style):
         filter_options.append({
-            'attribute': atribute,
+            'attribute': attribute,
             'is_collapse': is_collapse,
             'is_form_filter': is_form_filter,
             'is_selected': is_selected,
@@ -333,36 +332,50 @@ class NestBundleProductController(http.Controller):
 
         current_store = request.env['nb.shopify.store'].sudo().search(
             [("store_url", '=', kw['store_url'])], limit=1)
-        has_more_page= None
 
-        product_list = None
-        if type(kw['query']) == int:
-            product_list = json.dumps(json.loads(current_store.product_list)[:12])
-            last_page = math.ceil(len(json.loads(current_store.product_list)) / 12)
-            has_more_page = True if last_page - kw['query'] > 0 else False
+        if kw['query']['value'] == '':
+            total_product = json.loads(current_store.product_list)
+            product_list = self.get_product_chunk(total_product, kw['query']['pagination'] - 1, 12)
+            # last_page = math.ceil(len(json.loads(current_store.product_list)) / 12)
+            # has_more_page = True if last_page - kw['query']['pagination'] > 0 else False
 
         else:
-            product_list = list(filter(lambda x: x[kw['query']['option']] == kw['query']['value']['label'], json.loads(current_store.product_list)))
-            last_page = math.ceil(len(product_list) / 12)
-            product_list = json.dumps(product_list[:12])
+            if kw['query']['option'] == 'collections':
+                total_product = list(
+                    filter(lambda x: any(option['title'] == kw['query']['value']['label'] for option in x[kw['query']['option']]),
+                           json.loads(current_store.product_list)))
+            elif kw['query']['option'] == 'tags':
+                total_product = list(
+                    filter(lambda x: any(
+                        option == kw['query']['value']['label'] for option in x[kw['query']['option']]),
+                           json.loads(current_store.product_list)))
+            else:
+                total_product = list(filter(lambda x: x[kw['query']['option']] == kw['query']['value']['label'],
+                                            json.loads(current_store.product_list)))
+            # last_page = math.ceil(len(product_list) / 12)
+            product_list = self.get_product_chunk(total_product, kw['query']['pagination'] - 1, 12)
 
-            has_more_page = True if last_page - kw['query']['pagnition'] > 0 else False
+            # has_more_page = True if last_page - kw['query']['pagination'] > 0 else False
 
-
-
-        pagnition = {
-            'current_page': kw['query'],
-            'from': kw['query'],
-            'hasMorePages': has_more_page,
-            'last_page': last_page,
+        pagination = {
+            'current_page': kw['query']['pagination'],
+            # 'from': kw['query'],
+            # 'hasMorePages': has_more_page,
+            # 'last_page': last_page,
             'per_page': 12,
-            'total': len(json.dumps(current_store.product_list)),
+            'total': len(total_product),
         }
         if current_store:
             return {
                 'code': 0,
                 'filter_options': current_store.filter_option if kw['is_mounted'] is True else '',
-                'pagnition': pagnition,
-                "product_list":product_list,
+                'pagination': pagination,
+                "product_list": product_list,
                 "is_mounted": True if kw['is_mounted'] == True else False
             }
+
+    def get_product_chunk(self, product_list, chunk_number, chunk_size):
+        # chunk_number the number of chunk want to get (0:first 12)
+        start_index = chunk_number * chunk_size
+        end_index = start_index + chunk_size
+        return json.dumps(product_list[start_index:end_index])
