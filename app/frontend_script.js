@@ -11,6 +11,13 @@ import * as events from "events";
 
 library.add(fas, far)
 let MainFrame = document.getElementById('MainContent')
+// let shopifySearchModal = document.getElementsByClassName('search-modal modal__content gradient')
+// shopifySearchModal.remove()
+
+let productGrid = MainFrame.querySelector('[id*="product-grid"]')
+if (productGrid.nextElementSibling === null) {
+    productGrid.remove()
+}
 
 if (window.location.href.includes('/collections/')) {
     let collection = document.createElement('div');

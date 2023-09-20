@@ -1,9 +1,9 @@
 <template>
-    <div style="font-family: 'Be Vietnam Pro', sans-serif !important" id="main-container">
+    <div style="font-family: 'Be Vietnam Pro', sans-serif !important" id="nds-main-container">
         <div class="filter-tree" style="">
             <Dropdown :filter_options="filter_options" @setChooseFilter="setChooseFilter"/>
         </div>
-        <div class="main-grid">
+        <div class="nds-main-grid">
             <Input class="nb-input" v-model:value="search_query_product"
                    placeholder="Search by product name"
                    style="margin-bottom: 14px;" @input="searchProduct">

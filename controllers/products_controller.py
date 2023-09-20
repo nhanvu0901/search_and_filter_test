@@ -49,13 +49,15 @@ class NestBundleProductController(http.Controller):
                 error_count = 0
                 limit = 17
 
+                theme = shopify.Theme.find()
+
                 while True:
                     query = ('{products(first: %d, query: "title:%s* AND status:ACTIVE" after:"%s" ) {'
                              'pageInfo {hasNextPage}'
                              'edges {cursor node {id title '
                              'collections(first: 5) { nodes {title}}'
                              'options(first: 5) { id name values } '
-                             'variants(first: 5) { nodes {id availableForSale compareAtPrice price title image {url} }}'
+                             'variants(first: 5) { nodes {id availableForSale sku compareAtPrice price title image {url} }}'
                              ' title handle createdAt productType tags vendor images(first: 1) {edges { node {originalSrc}}} }}}}') % (
                                 limit, search_query, last_element) \
                         if loop != 0 else (
@@ -64,7 +66,7 @@ class NestBundleProductController(http.Controller):
                                               'edges {cursor node {id title '
                                               'collections(first: 5) { nodes  {title}}'
                                               'options(first: 4) { id name values } '
-                                              'variants(first: 5) { nodes {id availableForSale compareAtPrice price title image {url} }}'
+                                              'variants(first: 5) { nodes {id availableForSale sku compareAtPrice price title image {url} }}'
                                               ' title handle createdAt productType tags vendor images(first: 1) {edges { node {originalSrc}}}}}}}') % (
                                               limit, search_query)
 
