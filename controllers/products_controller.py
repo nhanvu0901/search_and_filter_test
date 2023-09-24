@@ -10,6 +10,9 @@ from urllib import parse
 import time
 from .auth import verify_request
 from .auth import verify_app_proxy_request
+import requests
+import re
+from bs4 import BeautifulSoup
 
 _logger = logging.getLogger(__name__)
 
@@ -20,6 +23,7 @@ list_tags = []
 
 
 class NestBundleProductController(http.Controller):
+
     @http.route('/nb/products_search/<string:mode>', methods=['POST'], type='json', auth='public')
     def search_product(self, mode, **kw):
         try:
@@ -49,7 +53,16 @@ class NestBundleProductController(http.Controller):
                 error_count = 0
                 limit = 17
 
-                theme = shopify.Theme.find()
+                theme = shopify.Asset.find(key="sections/main-collection-product-grid.liquid")
+                liquid_string = theme.value
+                start_index = liquid_string.find("<div ")
+                split_list = liquid_string.rpartition("</div>")
+                index_last = len(liquid_string) - len(split_list[2])
+                liquid_string = liquid_string[start_index:index_last]
+                list_child = []
+                soup = BeautifulSoup(liquid_string, 'html.parser')
+                self.find_for_loops(soup, list_child)
+                print(list_child[len(list_child) - 1])
 
                 while True:
                     query = ('{products(first: %d, query: "title:%s* AND status:ACTIVE" after:"%s" ) {'
@@ -344,7 +357,8 @@ class NestBundleProductController(http.Controller):
         else:
             if kw['query']['option'] == 'collections':
                 total_product = list(
-                    filter(lambda x: any(option['title'] == kw['query']['value']['label'] for option in x[kw['query']['option']]),
+                    filter(lambda x: any(
+                        option['title'] == kw['query']['value']['label'] for option in x[kw['query']['option']]),
                            json.loads(current_store.product_list)))
             elif kw['query']['option'] == 'tags':
                 total_product = list(
@@ -381,3 +395,11 @@ class NestBundleProductController(http.Controller):
         start_index = chunk_number * chunk_size
         end_index = start_index + chunk_size
         return json.dumps(product_list[start_index:end_index])
+
+    def find_for_loops(self, tag, list_child):
+        if '{%- for product' in tag.prettify():  # Checking for both hyphenated and non-hyphenated for loop syntax
+            print(tag.prettify())
+            list_child.append(tag)
+            for child in tag.children:
+                if child.name:  # Ensuring that the child is a tag and not a NavigableString
+                    self.find_for_loops(child,list_child)
