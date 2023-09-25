@@ -4,3 +4,4 @@ access_nb_bundle,nb_bundle,model_nb_bundle,base.group_system,1,1,1,1
 access_nb_bundle_analytic,nb_bundle_analytic,model_nb_bundle_analytic,base.group_system,1,1,1,1
 access_nb_bundle_design,nb_bundle_design,model_nb_bundle_design,base.group_system,1,1,1,1
 access_nb_webhook_log,nb_webhook_log,model_nb_webhook_log,base.group_system,1,1,1,1
+access_theme_store,theme_store,model_theme_store,base.group_system,1,1,1,1

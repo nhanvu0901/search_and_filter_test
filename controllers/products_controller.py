@@ -9,7 +9,8 @@ from array import array
 from urllib import parse
 import time
 from .auth import verify_request
-from .auth import verify_app_proxy_request
+import re
+from bs4 import BeautifulSoup
 
 _logger = logging.getLogger(__name__)
 
@@ -48,8 +49,29 @@ class NestBundleProductController(http.Controller):
                 last_element = ''
                 error_count = 0
                 limit = 17
-
-                theme = shopify.Theme.find()
+                theme_id = shopify.Theme.find()
+                theme_name = theme_id[0].name
+                theme_id = theme_id[0].id
+                theme = shopify.Asset.find(key="sections/main-collection-product-grid.liquid", theme_id=str(theme_id))
+                liquid_string = theme.value
+                variable_start_index = liquid_string.find("{% schema %}")
+                index_last = liquid_string.find("{% endschema %}")
+                variable_end_index = len(liquid_string) - len(split_list[2])
+                start_index = liquid_string.find("<div ")
+                split_list = liquid_string.rpartition("</div>")
+                index_last = len(liquid_string) - len(split_list[2])
+                liquid_string = liquid_string[start_index:index_last]
+                list_child = []
+                soup = BeautifulSoup(liquid_string, 'html.parser')
+                self.find_for_loops(soup, list_child)
+                contain_card = list_child[len(list_child) - 1]
+                child_tag = None
+                child_element = contain_card.children
+                for child in child_element:
+                    if child.name:
+                        child_tag = child
+                parent_tag = contain_card.parent
+                print(child_tag + parent_tag)
 
                 while True:
                     query = ('{products(first: %d, query: "title:%s* AND status:ACTIVE" after:"%s" ) {'
@@ -335,32 +357,41 @@ class NestBundleProductController(http.Controller):
         current_store = request.env['nb.shopify.store'].sudo().search(
             [("store_url", '=', kw['store_url'])], limit=1)
 
-        if kw['query']['value'] == '':
+        if len(kw['query']) == 0:
             total_product = json.loads(current_store.product_list)
-            product_list = self.get_product_chunk(total_product, kw['query']['pagination'] - 1, 12)
+            current_page = 1
+
             # last_page = math.ceil(len(json.loads(current_store.product_list)) / 12)
             # has_more_page = True if last_page - kw['query']['pagination'] > 0 else False
 
         else:
-            if kw['query']['option'] == 'collections':
-                total_product = list(
-                    filter(lambda x: any(option['title'] == kw['query']['value']['label'] for option in x[kw['query']['option']]),
-                           json.loads(current_store.product_list)))
-            elif kw['query']['option'] == 'tags':
-                total_product = list(
-                    filter(lambda x: any(
-                        option == kw['query']['value']['label'] for option in x[kw['query']['option']]),
-                           json.loads(current_store.product_list)))
-            else:
-                total_product = list(filter(lambda x: x[kw['query']['option']] == kw['query']['value']['label'],
-                                            json.loads(current_store.product_list)))
+            current_page = kw['query']['pagination'] - 1
+            total_product = []
+            for selected_filter in kw['query']['selected_filter']:
+                filter_list = []
+                if selected_filter['option'] == 'collections':
+                    filter_list = list(
+                        filter(lambda x: any(option['title'] == selected_filter['value']['label'] for option in
+                                             x[selected_filter['option']]),
+                               json.loads(current_store.product_list)))
+                elif selected_filter['option'] == 'tags':
+                    filter_list = list(
+                        filter(lambda x: any(
+                            option == selected_filter['value']['label'] for option in x[selected_filter['option']]),
+                               json.loads(current_store.product_list)))
+                else:
+                    filter_list = list(
+                        filter(lambda x: x[selected_filter['option']] == selected_filter['value']['label'],
+                               json.loads(current_store.product_list)))
+                total_product = total_product + filter_list
             # last_page = math.ceil(len(product_list) / 12)
-            product_list = self.get_product_chunk(total_product, kw['query']['pagination'] - 1, 12)
+        total_product = sorted(total_product, key=lambda x: x['title'])
+        product_list = self.get_product_chunk(total_product, current_page, 12)
 
-            # has_more_page = True if last_page - kw['query']['pagination'] > 0 else False
+        # has_more_page = True if last_page - kw['query']['pagination'] > 0 else False
 
         pagination = {
-            'current_page': kw['query']['pagination'],
+            'current_page': current_page,
             # 'from': kw['query'],
             # 'hasMorePages': has_more_page,
             # 'last_page': last_page,
@@ -380,4 +411,14 @@ class NestBundleProductController(http.Controller):
         # chunk_number the number of chunk want to get (0:first 12)
         start_index = chunk_number * chunk_size
         end_index = start_index + chunk_size
-        return json.dumps(product_list[start_index:end_index])
+        product_list = product_list[start_index:end_index]
+
+        return json.dumps(product_list)
+
+    def find_for_loops(self, tag, list_child):
+        if '{%- for product' in tag.prettify():  # Checking for both hyphenated and non-hyphenated for loop syntax
+
+            list_child.append(tag)
+            for child in tag.children:
+                if child.name:  # Ensuring that the child is a tag and not a NavigableString
+                    self.find_for_loops(child, list_child)
