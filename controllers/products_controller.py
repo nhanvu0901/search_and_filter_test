@@ -62,7 +62,8 @@ class NestBundleProductController(http.Controller):
                 list_child = []
                 soup = BeautifulSoup(liquid_string, 'html.parser')
                 self.find_for_loops(soup, list_child)
-                print(list_child[len(list_child) - 1])
+                contain_card = list_child[len(list_child) - 1]
+                print(contain_card)
 
                 while True:
                     query = ('{products(first: %d, query: "title:%s* AND status:ACTIVE" after:"%s" ) {'
@@ -398,7 +399,7 @@ class NestBundleProductController(http.Controller):
 
     def find_for_loops(self, tag, list_child):
         if '{%- for product' in tag.prettify():  # Checking for both hyphenated and non-hyphenated for loop syntax
-            print(tag.prettify())
+
             list_child.append(tag)
             for child in tag.children:
                 if child.name:  # Ensuring that the child is a tag and not a NavigableString
