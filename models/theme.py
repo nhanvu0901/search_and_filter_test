@@ -12,5 +12,7 @@ class NestBundleShopifyStore(models.Model):
     name = fields.Char()
     id = fields.Char()
     shopify_store = fields.Many2one("nb.shopify.store")
-    parent_class = fields.Char()
+
     child_class = fields.Char()
+    contain_class = fields.Char()
+

@@ -8,7 +8,8 @@
     "build": "webpack --env NODE_ENV=development --config ./webpack.config.dev.js",
     "production": "webpack --env NODE_ENV=production --config ./webpack.config.dev.js",
     "shopify": "webpack --env NODE_ENV=development --config ./webpack.config.dev.shopify.js",
-    "shopify_production": "webpack --env NODE_ENV=production --config ./webpack.config.dev.shopify.js"
+    "shopify_production": "webpack --env NODE_ENV=production --config ./webpack.config.dev.shopify.js",
+    "theme": "webpack --env NODE_ENV=development --config ./webpack.config.dev.theme.drag.js"
   },
   "author": "",
   "license": "ISC",

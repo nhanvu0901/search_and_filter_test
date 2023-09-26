@@ -7,41 +7,77 @@ import {FontAwesomeIcon} from "@fortawesome/vue-fontawesome"
 import {fas} from '@fortawesome/free-solid-svg-icons'
 import {library} from '@fortawesome/fontawesome-svg-core'
 import {far} from '@fortawesome/free-regular-svg-icons'
-import * as events from "events";
+import axios from 'axios';
 
 library.add(fas, far)
-window.captureElement = function () {
-    if (meta.page.pageType === 'home' || meta.page.pageType === 'collection') {
-        var liElements = document.querySelectorAll('li');
-        var articleElements = document.querySelectorAll('article');
 
-        var hasProductLinkInLi = Array.from(liElements).some(function (li) {
-            var anchor = li.querySelector("a[href*='/products/']");
-            if (anchor !== null) {
-                return !(anchor.classList.contains('product-single__thumbnail') || anchor.classList.contains('product-slideshow__open'));
-            }
-
-        });
-
-        var hasProductLinkInArticle = Array.from(articleElements).some(function (article) {
-            var anchor = article.querySelector("a[href*='/products/']");
-            if (anchor !== null) {
-                return !(anchor.classList.contains('product-single__thumbnail') || anchor.classList.contains('product-slideshow__open'));
-            }
-        });
-
-        if (hasProductLinkInLi) {
-
-        } else if (hasProductLinkInArticle) {
-            // do something else
-        } else {
-            // do another thing
+window.findProductContainer = function () {
+    var liElements = document.querySelectorAll('li');
+    var articleElements = document.querySelectorAll('article');
+    let element = null
+    var hasProductLinkInLi = Array.from(liElements).some(function (li) {
+        var anchor = li.querySelector("a[href*='/products/']");
+        if (anchor !== null) {
+            element = li
+            return !(anchor.classList.contains('product-single__thumbnail') || anchor.classList.contains('product-slideshow__open'));
         }
+
+    });
+
+    var hasProductLinkInArticle = Array.from(articleElements).some(function (article) {
+        var anchor = article.querySelector("a[href*='/products/']");
+        if (anchor !== null) {
+            if (element === null) {
+                element = article
+            }
+            return !(anchor.classList.contains('product-single__thumbnail') || anchor.classList.contains('product-slideshow__open'));
+        }
+    });
+    if (hasProductLinkInLi) {
+        return element
+    } else if (hasProductLinkInArticle) {
+        return element
+    } else {
+        // get the selector in backend
+    }
+}
+
+
+window.captureElement = function () {
+    if (window.location.href.includes('/collections/')) {
+        let element = window.findProductContainer()
+        let screen_type = ''
+        let parent_attribute = []
+
+        for (let i = 0; i < element.parentElement.attributes.length; i++) {
+            var varName = element.parentElement.attributes.item(i).name;
+            var dict = {};
+            dict[varName] = element.parentElement.attributes.item(i).value;
+            parent_attribute.push(dict)
+        }
+        axios.post('/apps/nestbundle/save_theme', {
+            jsonrpc: '2.0',
+            params: {
+
+                screen_type: screen_type,
+                theme: Shopify.theme,
+                store_url: window.location.hostname,
+                contain_class: parent_attribute,
+                child_class: element.outerHTML,
+            }
+        }).then(res => {
+            if (res.data.result.code === 0) {
+
+
+            }
+        }).catch(error => {
+        })
+
     }
 }
 
 if (window.location.href.includes('/collections/')) {
-    setTimeout(window.captureElement(), 1000);
+    setTimeout(window.captureElement(), 1500);
 
     // let MainFrame = document.getElementById('MainContent')
     // if (MainFrame) {
