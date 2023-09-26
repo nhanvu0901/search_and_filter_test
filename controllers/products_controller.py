@@ -50,7 +50,6 @@ class NestBundleProductController(http.Controller):
                 error_count = 0
                 limit = 17
 
-
                 theme_id = shopify.Theme.find()
                 theme_name = theme_id[0].name
                 theme_id = theme_id[0].id
@@ -444,18 +443,33 @@ class NestBundleProductController(http.Controller):
             "type": tags.name
         }
 
-
-
+    @http.route('/nb/get_theme', auth='public', type='json', method=['POST'], csrf=False, cors="*")
+    def get_theme(self, **kw):
+        current_store = request.env['nb.shopify.store'].sudo().search(
+            [("store_url", '=', kw['store_url'])], limit=1)
+        theme = request.env['theme.store'].sudo().search(
+            [("shopify_store", '=', current_store.id)], limit=1)
+        if not theme:
+           return False
+        else : return {
+            'name': theme.name,
+            'id': theme.id,
+            'shopify_store': theme.shopify_store,
+            "contain_class": theme.contain_class,
+            'child_class': theme.child_class
+        }
 
     @http.route('/nb/save_theme', auth='public', type='json', method=['POST'], csrf=False, cors="*")
     def save_theme(self, **kw):
         current_store = request.env['nb.shopify.store'].sudo().search(
             [("store_url", '=', kw['store_url'])], limit=1)
-
-        request.env['theme.store'].sudo().create({
-            'name': kw.get('theme').get('name'),
-            'id': kw.get('theme').get('id'),
-            'shopify_store': current_store.id,
-            "contain_class": kw.get('contain_class'),
-            'child_class': kw.get('child_class')
-        })
+        theme = request.env['theme.store'].sudo().search(
+            [("shopify_store", '=', current_store.id)], limit=1)
+        if not theme:
+            theme.create({
+                'name': kw.get('theme').get('name'),
+                'id': kw.get('theme').get('id'),
+                'shopify_store': current_store.id,
+                "contain_class": kw.get('contain_class'),
+                'child_class': kw.get('child_class')
+            })

@@ -72,41 +72,57 @@ window.captureElement = function () {
             }
         }).catch(error => {
         })
-
+        return {
+            screen_type: screen_type,
+            theme: Shopify.theme,
+            store_url: window.location.hostname,
+            contain_class: parent_attribute,
+            child_class: element.outerHTML,
+        }
     }
 }
 
 if (window.location.href.includes('/collections/')) {
-    setTimeout(window.captureElement(), 1500);
+    let self = this
+    let flag = false
+    let data = null
+    await axios.post('/apps/nestbundle/get_theme', {
+        jsonrpc: '2.0',
+        params: {
+            store_url: window.location.hostname,
+        }
+    }).then(res => {
+        if (res.data.result.code === 0) {
+            self.flag = true
+            self.data = res.data.result
+        } else {
 
-    // let MainFrame = document.getElementById('MainContent')
-    // if (MainFrame) {
-    //     let productGrid = MainFrame.querySelector('[id*="product-grid"]')
-    //     if (productGrid) {
-    //         let remove_element = productGrid.lastElementChild
-    //         remove_element.remove()
-    //         let collection = document.createElement('div');
-    //         collection.id = "nest-something-id"
-    //         collection.style.display = 'flex'
-    //         collection.style.justifyContent = 'center'
-    //         collection.style.width = "100%"
-    //         productGrid.appendChild(collection)
-    //         if (collection) {
-    //             createApp({
-    //                 name: 'Collection', render: () => {
-    //                     return h(ShopifyCollection, {
-    //                         data: {
-    //                             currency: Shopify.currency.active,
-    //                             currency_rate: parseFloat(Shopify.currency.rate),
-    //                             country_code: Shopify.country,
-    //                             locale: Shopify.locale
-    //                         }
-    //                     })
-    //                 }
-    //             }).component("font-awesome-icon", FontAwesomeIcon).use(Antd).mount(collection)
-    //         }
-    //     }
-    // }
+        }
+    }).catch(error => {
+    })
+
+    if (flag === false) {
+        data = window.captureElement()
+    }
+
+    let MainFrame = document.getElementById('nsd-main-container')
+    if (MainFrame) {
+
+     var collection =   createApp({
+            name: 'Collection', render: () => {
+                return h(ShopifyCollection, {
+                    data: {
+                        currency: Shopify.currency.active,
+                        currency_rate: parseFloat(Shopify.currency.rate),
+                        country_code: Shopify.country,
+                        locale: Shopify.locale
+                    }
+                })
+            }
+        }).component("font-awesome-icon", FontAwesomeIcon).use(Antd).mount(collection)
+
+
+    }
 
 
 }
