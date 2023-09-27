@@ -43,17 +43,38 @@ window.findProductContainer = function () {
 }
 
 
+window.findStyle = function () {
+    if (document.getElementById('nsd-main-container')) {
+        let div = document.getElementById('nsd-main-container')
+        return div.nextElementSibling.querySelectorAll('link[type="text/css"][rel="stylesheet"], style')
+    }
+}
+
 window.captureElement = function () {
     if (window.location.href.includes('/collections/')) {
         let element = window.findProductContainer()
         let screen_type = ''
         let parent_attribute = []
+        let save_style = []
+
+        let style_list = window.findStyle()
 
         for (let i = 0; i < element.parentElement.attributes.length; i++) {
             var varName = element.parentElement.attributes.item(i).name;
             var dict = {};
             dict[varName] = element.parentElement.attributes.item(i).value;
             parent_attribute.push(dict)
+        }
+        for (let i = 0; i < style_list.length; i++) {
+            var varName = style_list.item(i).localName;
+            var dict = {};
+            if (style_list.item(i).localName === 'link') {
+                dict[varName] = style_list.item(i).href;
+            } else {
+                dict[varName] = style_list.item(i).outerHTML;
+            }
+
+            save_style.push(dict)
         }
         axios.post('/apps/nestbundle/save_theme', {
             jsonrpc: '2.0',
@@ -64,6 +85,7 @@ window.captureElement = function () {
                 store_url: window.location.hostname,
                 contain_class: parent_attribute,
                 child_class: element.outerHTML,
+                style: save_style
             }
         }).then(res => {
             if (res.data.result.code === 0) {
@@ -78,6 +100,7 @@ window.captureElement = function () {
             store_url: window.location.hostname,
             contain_class: parent_attribute,
             child_class: element.outerHTML,
+            style: save_style
         }
     }
 }
@@ -85,7 +108,7 @@ window.captureElement = function () {
 if (window.location.href.includes('/collections/')) {
     let self = this
     let flag = false
-    let data = null
+    let data_theme = null
     await axios.post('/apps/nestbundle/get_theme', {
         jsonrpc: '2.0',
         params: {
@@ -93,8 +116,8 @@ if (window.location.href.includes('/collections/')) {
         }
     }).then(res => {
         if (res.data.result.code === 0) {
-            self.flag = true
-            self.data = res.data.result
+            flag = true
+            data_theme = res.data.result
         } else {
 
         }
@@ -102,24 +125,35 @@ if (window.location.href.includes('/collections/')) {
     })
 
     if (flag === false) {
-        data = window.captureElement()
+        data_theme = window.captureElement()
+
     }
-
+    window.data_theme = data_theme
     let MainFrame = document.getElementById('nsd-main-container')
-    if (MainFrame) {
 
-     var collection =   createApp({
+    for (let i = 0; i < data_theme.style.length; i++) {
+        let tag = null
+        if (Object.keys(window.data_theme.style[i])[0] === 'link') {
+            tag = document.createElement('link')
+            tag.href = window.data_theme.style[i].link
+
+        } else {
+            tag = document.createElement('style')
+            tag.insertAdjacentHTML('beforeend', window.data_theme.style[i].style)
+        }
+        MainFrame.appendChild(tag)
+    }
+    if (MainFrame) {
+        let main =document.createElement('div')
+        main.id = 'nsd-main'
+        MainFrame.appendChild(main)
+        createApp({
             name: 'Collection', render: () => {
                 return h(ShopifyCollection, {
-                    data: {
-                        currency: Shopify.currency.active,
-                        currency_rate: parseFloat(Shopify.currency.rate),
-                        country_code: Shopify.country,
-                        locale: Shopify.locale
-                    }
+                    data: {}
                 })
             }
-        }).component("font-awesome-icon", FontAwesomeIcon).use(Antd).mount(collection)
+        }).component("font-awesome-icon", FontAwesomeIcon).use(Antd).mount(main)
 
 
     }
