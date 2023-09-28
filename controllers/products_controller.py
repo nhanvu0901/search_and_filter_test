@@ -476,3 +476,11 @@ class NestBundleProductController(http.Controller):
                 'child_class': kw.get('child_class'),
                 'style': kw.get('style')
             })
+            return {
+                'name': kw.get('theme').get('name'),
+                'id_theme': kw.get('theme').get('id'),
+                'shopify_store': current_store.id,
+                "contain_class": kw.get('contain_class'),
+                'child_class': kw.get('child_class'),
+                'style': kw.get('style')
+            }

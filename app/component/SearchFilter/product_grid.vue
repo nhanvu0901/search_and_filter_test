@@ -1,7 +1,5 @@
 <template>
-    <div>
-        {{generateGrid()}}
-    </div>
+     <div v-html="generateGrid()"></div>
 
     <!--    <div class="product-grid-container" id="ProductGridContainer">-->
     <!--        <div class="collection page-width">-->
@@ -81,13 +79,15 @@ export default {
     name: "ProductGrid",
     emits: [],
     props: {
-        product_list: Array
+        product_list: Array,
+
 
     },
     data() {
         return {
             currency: null,
-            style_theme:null
+            style_theme: null,
+            htmlContent: null
         }
     },
     methods: {
@@ -102,9 +102,41 @@ export default {
                 return variants[0]
             }
         },
-        generateGrid(){
+        editListProductVariable(outer_html){
 
-        }
+        },
+        generateGrid() {
+            let div_main = document.createElement('div')
+            div_main.id = 'nds-main-grid'
+            let data_theme = window.data_theme
+            let generate_contain_class = document.createElement(JSON.parse(data_theme.contain_class).type)
+            let attributesArray = JSON.parse(data_theme.contain_class).class
+            attributesArray.forEach(function (attributeObject) {
+                for (let key in attributeObject) {
+                    generate_contain_class.setAttribute(key, attributeObject[key]);
+                }
+            });
+            this.editListProductVariable(data_theme.child_class,)
+            for(let item in this.product_list){
+
+                generate_contain_class.insertAdjacentHTML('afterbegin', data_theme.child_class)
+            }
+
+
+
+
+
+
+
+
+
+
+
+
+            div_main.appendChild(generate_contain_class)
+            return div_main.outerHTML
+        },
+
     },
 
     mounted() {

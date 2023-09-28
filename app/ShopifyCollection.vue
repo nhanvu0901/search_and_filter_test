@@ -50,7 +50,7 @@ import {ref} from "vue";
 export default {
     name: "ShopifyCollection",
     components: {ProductGrid, Dropdown, SearchOutlined, Input, Pagination},
-    props: ['data_data'],
+
     data() {
         return {
             search_query_product: '',

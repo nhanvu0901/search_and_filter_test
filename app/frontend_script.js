@@ -50,9 +50,59 @@ window.findStyle = function () {
     }
 }
 
-window.captureElement = function () {
+function generate(data_theme) {
+    window.data_theme = data_theme
+    let MainFrame = document.getElementById('nsd-main-container')
+    let style_list = JSON.parse(data_theme.style)
+    for (let i = 0; i < style_list.length; i++) {
+        let tag = null
+        if (Object.keys(style_list[i])[0] === 'link') {
+            tag = document.createElement('link')
+            tag.href = style_list[i].link
+
+        } else {
+            tag = document.createElement('style')
+            tag.insertAdjacentHTML('beforeend', style_list[i].style)
+        }
+        MainFrame.appendChild(tag)
+    }
+    if (MainFrame) {
+        let main = document.createElement('div')
+        main.id = 'nsd-main'
+        MainFrame.appendChild(main)
+        createApp({
+            name: 'Collection', render: () => {
+                return h(ShopifyCollection, {})
+            }
+        }).component("font-awesome-icon", FontAwesomeIcon).use(Antd).mount(main)
+    }
+}
+
+window.getVariableHTMl = async function () {
+    let element = window.findProductContainer()
+    element = element.outerHTML
+    let parser = new DOMParser();
+    let doc = parser.parseFromString(element, 'text/html');
+    let url = ''
+    const elements = doc.querySelector("a[href*='/products/']");
+
+
+    if (elements) {
+        await axios.get(window.location.origin + elements.attributes.href.value + ".js").then(res => {
+            if (res.data !== null) {
+
+
+            }
+        }).catch(error => {
+        })
+    }
+}
+window.captureElement = async function () {
     if (window.location.href.includes('/collections/')) {
-        let element = window.findProductContainer()
+
+        window.getVariableHTMl()
+
+
         let screen_type = ''
         let parent_attribute = []
         let save_style = []
@@ -65,6 +115,10 @@ window.captureElement = function () {
             dict[varName] = element.parentElement.attributes.item(i).value;
             parent_attribute.push(dict)
         }
+        let parent_class = {
+            type: element.parentElement.localName,
+            class: parent_attribute
+        }
         for (let i = 0; i < style_list.length; i++) {
             var varName = style_list.item(i).localName;
             var dict = {};
@@ -76,34 +130,28 @@ window.captureElement = function () {
 
             save_style.push(dict)
         }
-        axios.post('/apps/nestbundle/save_theme', {
+        await axios.post('/apps/nestbundle/save_theme', {
             jsonrpc: '2.0',
             params: {
 
                 screen_type: screen_type,
                 theme: Shopify.theme,
                 store_url: window.location.hostname,
-                contain_class: parent_attribute,
+                contain_class: JSON.stringify(parent_class),
                 child_class: element.outerHTML,
-                style: save_style
+                style: JSON.stringify(save_style)
             }
         }).then(res => {
-            if (res.data.result.code === 0) {
+            if (res.data.result !== null) {
 
-
+                generate(res.data.result)
             }
         }).catch(error => {
         })
-        return {
-            screen_type: screen_type,
-            theme: Shopify.theme,
-            store_url: window.location.hostname,
-            contain_class: parent_attribute,
-            child_class: element.outerHTML,
-            style: save_style
-        }
+
     }
 }
+
 
 if (window.location.href.includes('/collections/')) {
     let self = this
@@ -115,9 +163,10 @@ if (window.location.href.includes('/collections/')) {
             store_url: window.location.hostname,
         }
     }).then(res => {
-        if (res.data.result.code === 0) {
+        if (res.data.result !== false) {
             flag = true
             data_theme = res.data.result
+            generate(data_theme)
         } else {
 
         }
@@ -125,36 +174,7 @@ if (window.location.href.includes('/collections/')) {
     })
 
     if (flag === false) {
-        data_theme = window.captureElement()
-
-    }
-    window.data_theme = data_theme
-    let MainFrame = document.getElementById('nsd-main-container')
-
-    for (let i = 0; i < data_theme.style.length; i++) {
-        let tag = null
-        if (Object.keys(window.data_theme.style[i])[0] === 'link') {
-            tag = document.createElement('link')
-            tag.href = window.data_theme.style[i].link
-
-        } else {
-            tag = document.createElement('style')
-            tag.insertAdjacentHTML('beforeend', window.data_theme.style[i].style)
-        }
-        MainFrame.appendChild(tag)
-    }
-    if (MainFrame) {
-        let main =document.createElement('div')
-        main.id = 'nsd-main'
-        MainFrame.appendChild(main)
-        createApp({
-            name: 'Collection', render: () => {
-                return h(ShopifyCollection, {
-                    data: {}
-                })
-            }
-        }).component("font-awesome-icon", FontAwesomeIcon).use(Antd).mount(main)
-
+        window.captureElement()
 
     }
 

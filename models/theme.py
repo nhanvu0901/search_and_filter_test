@@ -16,5 +16,6 @@ class NestBundleShopifyStore(models.Model):
     child_class = fields.Char()
     contain_class = fields.Char()
     style = fields.Char()
+    list_variable = fields.Char()
 
 
