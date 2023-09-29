@@ -78,29 +78,8 @@ function generate(data_theme) {
     }
 }
 
-window.getVariableHTMl = async function () {
-    let element = window.findProductContainer()
-    element = element.outerHTML
-    let parser = new DOMParser();
-    let doc = parser.parseFromString(element, 'text/html');
-    let url = ''
-    const elements = doc.querySelector("a[href*='/products/']");
-
-
-    if (elements) {
-        await axios.get(window.location.origin + elements.attributes.href.value + ".js").then(res => {
-            if (res.data !== null) {
-
-
-            }
-        }).catch(error => {
-        })
-    }
-}
-window.captureElement = async function () {
+window.captureElement = async function (list_attribute, element) {
     if (window.location.href.includes('/collections/')) {
-
-        window.getVariableHTMl()
 
 
         let screen_type = ''
@@ -139,12 +118,84 @@ window.captureElement = async function () {
                 store_url: window.location.hostname,
                 contain_class: JSON.stringify(parent_class),
                 child_class: element.outerHTML,
-                style: JSON.stringify(save_style)
+                style: JSON.stringify(save_style),
+                list_attribute: JSON.stringify(list_attribute)
             }
         }).then(res => {
             if (res.data.result !== null) {
 
                 generate(res.data.result)
+            }
+        }).catch(error => {
+        })
+
+    }
+}
+
+function make_list_attr(object_attr) {
+    let parent_attribute = []
+    for (let i = 0; i < object_attr.length; i++) {
+        var varName = object_attr.item(i).name;
+        var dict = {};
+        dict[varName] = object_attr.item(i).value;
+        parent_attribute.push(dict)
+    }
+    return parent_attribute
+}
+
+function containsString(element, searchString) {
+    let parent_attribute = []
+    if (element.textContent !== null) {
+        if (element.textContent.includes(searchString) && element.children.length === 0) {
+
+            for (let i = 0; i < element.attributes.length; i++) {
+                var varName = element.attributes.item(i).name;
+                var dict = {};
+                dict[varName] = element.attributes.item(i).value;
+                parent_attribute.push(dict)
+            }
+            return parent_attribute
+        }
+    }
+    for (let i = 0; i < element.children.length; i++) {
+        if (containsString(element.children[i], searchString)) {
+            for (let i = 0; i < element.attributes.length; i++) {
+                var varName = element.attributes.item(i).name;
+                var dict = {};
+                dict[varName] = element.attributes.item(i).value;
+                parent_attribute.push(dict)
+            }
+            return parent_attribute
+
+        }
+    }
+    return false;
+}
+
+window.getVariableHTMl = async function () {
+    let element = window.findProductContainer()
+    let element_outerHTML = element.outerHTML
+    let parser = new DOMParser();
+    let outterHTML = parser.parseFromString(element_outerHTML, 'text/html');
+    let url = ''
+    const elements = outterHTML.querySelector("a[href*='/products/']");
+    let list_attribute = []
+
+    if (elements) {
+
+        await axios.get(window.location.origin + elements.attributes.href.value + ".js").then(res => {
+            if (res.data !== null) {
+
+                for (let key in res.data) {
+                    let find_variable = containsString(outterHTML, res.data[key])
+                    if (find_variable !== false) {
+                        list_attribute.push({
+                            key: key,
+                            positions: find_variable
+                        });
+                    }
+                }
+                window.captureElement(list_attribute, element)
             }
         }).catch(error => {
         })
@@ -174,7 +225,7 @@ if (window.location.href.includes('/collections/')) {
     })
 
     if (flag === false) {
-        window.captureElement()
+        window.getVariableHTMl()
 
     }
 

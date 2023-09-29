@@ -14,7 +14,7 @@ from .currency_symbol import get_currency_symbol
 _logger = logging.getLogger(__name__)
 
 SCOPES = [
-    'read_products', "read_draft_orders", 'write_draft_orders', "read_orders", "read_themes"
+    'read_products', "read_draft_orders", 'write_draft_orders', "read_orders", "read_themes" , "read_content"
 ]
 
 

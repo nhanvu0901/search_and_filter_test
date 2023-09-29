@@ -21,6 +21,9 @@ list_tags = []
 
 
 class NestBundleProductController(http.Controller):
+
+
+
     @http.route('/nb/products_search/<string:mode>', methods=['POST'], type='json', auth='public')
     def search_product(self, mode, **kw):
         try:
@@ -49,7 +52,8 @@ class NestBundleProductController(http.Controller):
                 last_element = ''
                 error_count = 0
                 limit = 17
-
+                theme_id = shopify.Page.find()
+                print(theme_id)
                 # theme_id = shopify.Theme.find()
                 # theme_name = theme_id[0].name
                 # theme_id = theme_id[0].id
@@ -441,7 +445,7 @@ class NestBundleProductController(http.Controller):
             "id": tag_id,
             "class": tag_class,
             "type": tags.name
-        }
+         }
 
     @http.route('/nb/get_theme', auth='public', type='json', method=['POST'], csrf=False, cors="*")
     def get_theme(self, **kw):
@@ -458,7 +462,8 @@ class NestBundleProductController(http.Controller):
                 'shopify_store': theme.shopify_store,
                 "contain_class": theme.contain_class,
                 'child_class': theme.child_class,
-                'style': theme.style
+                'style': theme.style,
+                'list_attribute': theme.list_attribute
             }
 
     @http.route('/nb/save_theme', auth='public', type='json', method=['POST'], csrf=False, cors="*")
@@ -474,7 +479,8 @@ class NestBundleProductController(http.Controller):
                 'shopify_store': current_store.id,
                 "contain_class": kw.get('contain_class'),
                 'child_class': kw.get('child_class'),
-                'style': kw.get('style')
+                'style': kw.get('style'),
+                'list_attribute': kw.get('list_attribute')
             })
             return {
                 'name': kw.get('theme').get('name'),
@@ -482,5 +488,6 @@ class NestBundleProductController(http.Controller):
                 'shopify_store': current_store.id,
                 "contain_class": kw.get('contain_class'),
                 'child_class': kw.get('child_class'),
-                'style': kw.get('style')
+                'style': kw.get('style'),
+                'list_attribute': kw.get('list_attribute')
             }

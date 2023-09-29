@@ -102,7 +102,7 @@ export default {
                 return variants[0]
             }
         },
-        editListProductVariable(outer_html){
+        editListProductVariable(outer_html,list_attribute){
 
         },
         generateGrid() {
@@ -116,22 +116,11 @@ export default {
                     generate_contain_class.setAttribute(key, attributeObject[key]);
                 }
             });
-            this.editListProductVariable(data_theme.child_class,)
-            for(let item in this.product_list){
 
+            for(let item in this.product_list){
+                let new_edit_outerHTML = this.editListProductVariable(data_theme.child_class,JSON.parse(data_theme.list_attribute))
                 generate_contain_class.insertAdjacentHTML('afterbegin', data_theme.child_class)
             }
-
-
-
-
-
-
-
-
-
-
-
 
             div_main.appendChild(generate_contain_class)
             return div_main.outerHTML
