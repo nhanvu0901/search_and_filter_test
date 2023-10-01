@@ -132,69 +132,69 @@ window.captureElement = async function (list_attribute, element) {
     }
 }
 
-function make_list_attr(object_attr) {
-    let parent_attribute = []
-    for (let i = 0; i < object_attr.length; i++) {
-        var varName = object_attr.item(i).name;
-        var dict = {};
-        dict[varName] = object_attr.item(i).value;
-        parent_attribute.push(dict)
-    }
-    return parent_attribute
-}
 
-function containsString(element, searchString) {
-    let parent_attribute = []
-    if (element.textContent !== null) {
-        if (element.textContent.includes(searchString) && element.children.length === 0) {
+function processHtmlObject(htmlObject, list_attribute) {
+    const array = [];
 
-            for (let i = 0; i < element.attributes.length; i++) {
-                var varName = element.attributes.item(i).name;
-                var dict = {};
-                dict[varName] = element.attributes.item(i).value;
-                parent_attribute.push(dict)
-            }
-            return parent_attribute
+    function traverseNode(node, key, value) {
+        if (node.nodeType !== 1) {
+            return;
         }
-    }
-    for (let i = 0; i < element.children.length; i++) {
-        if (containsString(element.children[i], searchString)) {
-            for (let i = 0; i < element.attributes.length; i++) {
-                var varName = element.attributes.item(i).name;
-                var dict = {};
-                dict[varName] = element.attributes.item(i).value;
-                parent_attribute.push(dict)
-            }
-            return parent_attribute
 
+
+        if (node.children.length === 0) {
+            if (node.textContent.includes(typeof (value) === 'number' ? value / 100 : value)) {
+
+                if (!array.some((el) => el.key === key)) {
+                    let parent_attribute = []
+                    for (let i = 0; i < node.attributes.length; i++) {
+                        var varName = node.attributes.item(i).name;
+                        var dict = {};
+                        dict[varName] = node.attributes.item(i).value;
+                        parent_attribute.push(dict)
+                    }
+                    const obj = {
+                        key: key,
+                        value: value,
+                        attribute: parent_attribute
+                    };
+
+                    array.push(obj);
+                }
+
+            }
+        } else {
+            let child = node.firstChild;
+            while (child) {
+                traverseNode(child, key, value);
+                child = child.nextSibling;
+            }
         }
+
     }
-    return false;
+
+    for (let key in list_attribute) {
+        let value = list_attribute[key];
+        traverseNode(htmlObject, key, value);
+    }
+
+    return array;
 }
 
 window.getVariableHTMl = async function () {
     let element = window.findProductContainer()
-    let element_outerHTML = element.outerHTML
-    let parser = new DOMParser();
-    let outterHTML = parser.parseFromString(element_outerHTML, 'text/html');
-    let url = ''
-    const elements = outterHTML.querySelector("a[href*='/products/']");
-    let list_attribute = []
+
+
+    const elements = element.querySelector("a[href*='/products/']");
+
 
     if (elements) {
 
         await axios.get(window.location.origin + elements.attributes.href.value + ".js").then(res => {
             if (res.data !== null) {
 
-                for (let key in res.data) {
-                    let find_variable = containsString(outterHTML, res.data[key])
-                    if (find_variable !== false) {
-                        list_attribute.push({
-                            key: key,
-                            positions: find_variable
-                        });
-                    }
-                }
+                const list_attribute = processHtmlObject(element, res.data)
+
                 window.captureElement(list_attribute, element)
             }
         }).catch(error => {
