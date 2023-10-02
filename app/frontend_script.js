@@ -154,7 +154,8 @@ function processHtmlObject(htmlObject, list_attribute) {
             return;
         }
         if (node.children.length === 0) {
-            if (node.textContent.includes(typeof (value) === 'number' ? value / 100 : value)) {
+            let value_compare  =  key.includes('price') ? value / 100+" "+Shopify.currency.active : value
+            if (node.textContent.includes(value_compare)) {
 
                 if (!array.some((el) => el.key === key)) {
                     let child_attribute = getAttribute(node)
