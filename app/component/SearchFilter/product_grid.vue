@@ -1,5 +1,5 @@
 <template>
-     <div v-html="generateGrid()"></div>
+    <div v-html="generateGrid()"></div>
 
     <!--    <div class="product-grid-container" id="ProductGridContainer">-->
     <!--        <div class="collection page-width">-->
@@ -102,8 +102,32 @@ export default {
                 return variants[0]
             }
         },
-        editListProductVariable(outer_html,list_attribute){
+        editListProductVariable(outer_html, list_attribute, product) {
+            //Step 1 : change all the image url,get the tag of the elememt
+            let variant = this.returnVariant(product.variants)
+            let parser = new DOMParser();
+            let doc = parser.parseFromString(outer_html, 'text/html');
 
+            let container_element = doc.documentElement.children[1].firstChild
+            let anchor = container_element.querySelectorAll("a[href*='/products/']");
+            if (anchor.length > 1) {
+                for (let i = 0; i < anchor.length; i++) {
+                    anchor[i].href = window.location.origin + "/products/" + product.handle
+                }
+            } else {
+                anchor.href = window.location.origin + "/products/" + product.handle
+            }
+            let image_list = container_element.getElementsByTagName("img");
+
+            for (let i = 0; i < image_list.length; i++) {
+
+                image_list[i].srcset = product.img_src + "&amp;width=165 165w," + product.img_src + "&amp;width=360 360w," + product.img_src + " 466w"
+                image_list[i].src = product.img_src + "&amp;width=533"
+                image_list[i].alt = product.title
+            }
+
+
+            return container_element.outerHTML
         },
         generateGrid() {
             let div_main = document.createElement('div')
@@ -117,9 +141,9 @@ export default {
                 }
             });
 
-            for(let item in this.product_list){
-                let new_edit_outerHTML = this.editListProductVariable(data_theme.child_class,JSON.parse(data_theme.list_attribute))
-                generate_contain_class.insertAdjacentHTML('afterbegin', data_theme.child_class)
+            for (let item in this.product_list) {
+                let new_edit_outterHTML = this.editListProductVariable(data_theme.child_class, JSON.parse(data_theme.list_attribute), this.product_list[item])
+                generate_contain_class.insertAdjacentHTML('afterbegin', new_edit_outterHTML)
             }
 
             div_main.appendChild(generate_contain_class)

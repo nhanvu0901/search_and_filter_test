@@ -132,6 +132,19 @@ window.captureElement = async function (list_attribute, element) {
     }
 }
 
+function getAttribute(node) {
+    let parent_attribute = []
+    for (let i = 0; i < node.attributes.length; i++) {
+        if (node.attributes.item(i).name === 'class') {
+            var varName = node.attributes.item(i).name;
+            var dict = {};
+            dict[varName] = node.attributes.item(i).value;
+            parent_attribute.push(dict)
+        }
+
+    }
+    return parent_attribute
+}
 
 function processHtmlObject(htmlObject, list_attribute) {
     const array = [];
@@ -140,23 +153,23 @@ function processHtmlObject(htmlObject, list_attribute) {
         if (node.nodeType !== 1) {
             return;
         }
-
-
         if (node.children.length === 0) {
             if (node.textContent.includes(typeof (value) === 'number' ? value / 100 : value)) {
 
                 if (!array.some((el) => el.key === key)) {
-                    let parent_attribute = []
-                    for (let i = 0; i < node.attributes.length; i++) {
-                        var varName = node.attributes.item(i).name;
-                        var dict = {};
-                        dict[varName] = node.attributes.item(i).value;
-                        parent_attribute.push(dict)
-                    }
+                    let child_attribute = getAttribute(node)
+                    let parent_attribute = getAttribute(node.parentNode)
                     const obj = {
                         key: key,
                         value: value,
-                        attribute: parent_attribute
+                        child: {
+                            type: node.localName,
+                            attribute: child_attribute
+                        },
+                        parent: {
+                            type: node.parentNode.localName,
+                            attribute: parent_attribute
+                        }
                     };
 
                     array.push(obj);
