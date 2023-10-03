@@ -14,8 +14,18 @@ library.add(fas, far)
 window.findProductContainer = function () {
     var liElements = document.querySelectorAll('li');
     var articleElements = document.querySelectorAll('article');
+    var cardProductElemnt = document.querySelectorAll('card-product');
     let element = null
     var hasProductLinkInLi = Array.from(liElements).some(function (li) {
+        var anchor = li.querySelector("a[href*='/products/']");
+        if (anchor !== null) {
+            element = li
+            return !(anchor.classList.contains('product-single__thumbnail') || anchor.classList.contains('product-slideshow__open'));
+        }
+
+    });
+
+     var hasProductLinkCard = Array.from(cardProductElemnt).some(function (li) {
         var anchor = li.querySelector("a[href*='/products/']");
         if (anchor !== null) {
             element = li
@@ -37,7 +47,10 @@ window.findProductContainer = function () {
         return element
     } else if (hasProductLinkInArticle) {
         return element
-    } else {
+    }else if(hasProductLinkCard){
+        return  element
+    }
+    else {
         // get the selector in backend
     }
 }
@@ -150,11 +163,11 @@ function processHtmlObject(htmlObject, list_attribute) {
     const array = [];
 
     function traverseNode(node, key, value) {
-        if (node.nodeType !== 1) {
+        if (node.nodeType !== 1 || node.localName.includes("script") ) {
             return;
         }
         if (node.children.length === 0) {
-            let value_compare  =  key.includes('price') ? value / 100+" "+Shopify.currency.active : value
+            let value_compare = key.includes('price') ? value / 100 + " " + Shopify.currency.active : value
             if (node.textContent.includes(value_compare)) {
 
                 if (!array.some((el) => el.key === key)) {

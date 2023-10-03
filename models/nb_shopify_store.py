@@ -45,6 +45,8 @@ class NestBundleShopifyStore(models.Model):
     product_list = fields.Char()
     filter_option = fields.Char()
 
+    theme_id = fields.One2many("theme.store", "shopify_store")
+
     def register_webhook(self):
         try:
             self.ensure_one()

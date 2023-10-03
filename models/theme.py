@@ -19,3 +19,4 @@ class NestBundleShopifyStore(models.Model):
     list_attribute = fields.Char()
 
 
+
