@@ -261,13 +261,13 @@ if (window.location.href.includes('/collections/')) {
 
 window.findSearchContainer = function () {
     let detailModalElements = document.querySelector("details-modal.header__search");
-    let anchor = document.querySelector("a[href*='/search'], a[aria-label='Search']");
+    let anchor = document.querySelector("a[href*='/search'], a[aria-label='Search']");//search no o header cho chac
 
     let element = null
 
 
     if (detailModalElements) {
-        element = document.querySelector('summary');
+        element = detailModalElements.querySelector('summary');
 
     }
     if (anchor) {
@@ -281,7 +281,34 @@ window.findSearchContainer = function () {
 }
 
 let search_button = window.findSearchContainer()
-search_button.addEventListener("click", function(event) {
-  event.stopPropagation(); // Prevents the event from bubbling up the DOM tree
+
+
+const targetNode = search_button.parentNode
+
+// Options for the observer (which mutations to observe)
+const config = { attributes: true, childList: false, subtree: false };
+
+// Callback function to execute when mutations are observed
+const callback = function(mutationsList, observer) {
+    for(let mutation of mutationsList) {
+        if (mutation.type === 'attributes') {
+            console.log('The ' + mutation.attributeName + ' attribute was modified.');
+        }
+    }
+};
+
+// Create an observer instance linked to the callback function
+const observer = new MutationObserver(callback);
+
+// Start observing the target node for configured mutations
+observer.observe(targetNode, config);
+
+// Later, you can stop observing
+// observer.disconnect();
+
+
+
+
+search_button.addEventListener('click', function(event) {
   console.log("Nhan dep zai")
-}, true);
+});
