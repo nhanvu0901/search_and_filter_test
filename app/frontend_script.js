@@ -25,7 +25,7 @@ window.findProductContainer = function () {
 
     });
 
-     var hasProductLinkCard = Array.from(cardProductElemnt).some(function (li) {
+    var hasProductLinkCard = Array.from(cardProductElemnt).some(function (li) {
         var anchor = li.querySelector("a[href*='/products/']");
         if (anchor !== null) {
             element = li
@@ -47,10 +47,9 @@ window.findProductContainer = function () {
         return element
     } else if (hasProductLinkInArticle) {
         return element
-    }else if(hasProductLinkCard){
-        return  element
-    }
-    else {
+    } else if (hasProductLinkCard) {
+        return element
+    } else {
         // get the selector in backend
     }
 }
@@ -163,7 +162,7 @@ function processHtmlObject(htmlObject, list_attribute) {
     const array = [];
 
     function traverseNode(node, key, value) {
-        if (node.nodeType !== 1 || node.localName.includes("script") ) {
+        if (node.nodeType !== 1 || node.localName.includes("script")) {
             return;
         }
         if (node.children.length === 0) {
@@ -260,4 +259,29 @@ if (window.location.href.includes('/collections/')) {
 }
 
 
+window.findSearchContainer = function () {
+    let detailModalElements = document.querySelector("details-modal.header__search");
+    let anchor = document.querySelector("a[href*='/search'], a[aria-label='Search']");
 
+    let element = null
+
+
+    if (detailModalElements) {
+        element = document.querySelector('summary');
+
+    }
+    if (anchor) {
+        element = anchor
+
+    }
+
+    return element
+
+
+}
+
+let search_button = window.findSearchContainer()
+search_button.addEventListener("click", function(event) {
+  event.stopPropagation(); // Prevents the event from bubbling up the DOM tree
+  console.log("Nhan dep zai")
+}, true);
