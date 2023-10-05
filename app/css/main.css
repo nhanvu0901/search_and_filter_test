@@ -3718,7 +3718,6 @@ nb-dashboard-tab-block-description {
 }
 
 
-
 @media screen and (max-width: 1130px) {
     .nb-dashboard-tab-block {
         flex-direction: column;
@@ -3746,3 +3745,4 @@ nb-dashboard-tab-block-description {
         align-items: baseline;
     }
 }
+

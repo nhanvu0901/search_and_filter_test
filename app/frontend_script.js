@@ -1,5 +1,6 @@
 import {createApp, h} from 'vue/dist/vue.esm-bundler'
 import ShopifyCollection from "./ShopifyCollection.vue";
+import Search from "../app/component/SearchFilter/search.vue"
 import CartPreview from "./component/cart_preview.vue"
 import 'ant-design-vue/dist/antd.css'
 import Antd from 'ant-design-vue'
@@ -10,6 +11,93 @@ import {far} from '@fortawesome/free-regular-svg-icons'
 import axios from 'axios';
 
 library.add(fas, far)
+
+let body = document.body
+if (body) {
+    let main = document.createElement('div')
+    main.id = 'nsd-search-panel'
+    main.style.cssText += `
+        position:fixed;
+        top:0px;
+        
+          height: 0;
+          width: 100vw;
+          z-index: 0;
+          overflow:hidden;
+          background: rgba(26, 26, 26, 0.25);
+        `;
+    document.body.insertBefore(main, document.body.firstChild);
+    createApp({
+        name: 'Search', render: () => {
+            return h(Search, {})
+        }
+    }).use(Antd).mount(main)
+}
+
+window.findSearchContainer = function () {
+    let detailModalElements = document.querySelector("details-modal.header__search");
+
+    let header = body.querySelector("header a[href*='/search']").closest("header")
+    let anchor = header.querySelectorAll("a[href*='/search'], a[aria-label='Search']");//search no o header cho chac
+
+    let element = null
+
+
+    if (detailModalElements) {
+        element = detailModalElements.querySelector('summary');
+
+    }
+    if (anchor) {
+         for (let link of anchor) {
+             element = anchor
+         }
+
+
+    }
+
+    return element
+
+
+}
+
+let search_button = window.findSearchContainer()
+
+if (search_button.localName === 'summary') {
+    const targetNode = search_button.parentNode
+
+    const config = {attributes: true, childList: false, subtree: false};
+
+    const callback = function (mutationsList, observer) {
+        for (let mutation of mutationsList) {
+            if (mutation.type === 'attributes') {
+                console.log('The ' + mutation.attributeName + ' attribute was modified.');
+                mutation.target.removeAttribute("open");
+                document.body.classList.remove('overflow-hidden');
+            }
+        }
+    };
+
+    const observer = new MutationObserver(callback);
+
+    observer.observe(targetNode, config);
+
+// Later, you can stop observing
+// observer.disconnect();
+
+}
+
+
+search_button.addEventListener('click', function (event) {
+    event.stopPropagation();
+    console.log("Nhan dep zai")
+
+    document.getElementById("nsd-search-panel").style.cssText += `
+      height: 100vh;
+      width: 100vw;
+      z-index: 99999;
+    `;
+});
+
 
 window.findProductContainer = function () {
     var liElements = document.querySelectorAll('li');
@@ -254,61 +342,4 @@ if (window.location.href.includes('/collections/')) {
         window.getVariableHTMl()
 
     }
-
-
 }
-
-
-window.findSearchContainer = function () {
-    let detailModalElements = document.querySelector("details-modal.header__search");
-    let anchor = document.querySelector("a[href*='/search'], a[aria-label='Search']");//search no o header cho chac
-
-    let element = null
-
-
-    if (detailModalElements) {
-        element = detailModalElements.querySelector('summary');
-
-    }
-    if (anchor) {
-        element = anchor
-
-    }
-
-    return element
-
-
-}
-
-let search_button = window.findSearchContainer()
-
-
-const targetNode = search_button.parentNode
-
-// Options for the observer (which mutations to observe)
-const config = { attributes: true, childList: false, subtree: false };
-
-// Callback function to execute when mutations are observed
-const callback = function(mutationsList, observer) {
-    for(let mutation of mutationsList) {
-        if (mutation.type === 'attributes') {
-            console.log('The ' + mutation.attributeName + ' attribute was modified.');
-        }
-    }
-};
-
-// Create an observer instance linked to the callback function
-const observer = new MutationObserver(callback);
-
-// Start observing the target node for configured mutations
-observer.observe(targetNode, config);
-
-// Later, you can stop observing
-// observer.disconnect();
-
-
-
-
-search_button.addEventListener('click', function(event) {
-  console.log("Nhan dep zai")
-});
