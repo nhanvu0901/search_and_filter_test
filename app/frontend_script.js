@@ -37,33 +37,26 @@ if (body) {
 window.findSearchContainer = function () {
     let detailModalElements = document.querySelector("details-modal.header__search");
 
-    let header = body.querySelector("header a[href*='/search']").closest("header")
-    let anchor = header.querySelectorAll("a[href*='/search'], a[aria-label='Search']");//search no o header cho chac
 
-    let element = null
+    const anchors = body.querySelectorAll('header a[href*="/search"]')
 
 
     if (detailModalElements) {
-        element = detailModalElements.querySelector('summary');
-
+        let element = detailModalElements.querySelector('summary');
+        return {element: element, type: 'summary'}
     }
-    if (anchor) {
-         for (let link of anchor) {
-             element = anchor
-         }
-
-
+    if (anchors) {
+        let element = anchors
+        return {element: element, type: "anchor"}
     }
-
-    return element
 
 
 }
 
 let search_button = window.findSearchContainer()
 
-if (search_button.localName === 'summary') {
-    const targetNode = search_button.parentNode
+if (search_button.type === 'summary') {
+    const targetNode = search_button.element.parentNode
 
     const config = {attributes: true, childList: false, subtree: false};
 
@@ -83,21 +76,37 @@ if (search_button.localName === 'summary') {
 
 // Later, you can stop observing
 // observer.disconnect();
+    search_button.element.addEventListener('click', function (event) {
+        event.stopPropagation();
+        console.log("Nhan dep zai")
 
-}
-
-
-search_button.addEventListener('click', function (event) {
-    event.stopPropagation();
-    console.log("Nhan dep zai")
-
-    document.getElementById("nsd-search-panel").style.cssText += `
+        document.getElementById("nsd-search-panel").style.cssText += `
       height: 100vh;
       width: 100vw;
       z-index: 99999;
     `;
-});
+    });
+} else {
+    search_button.element.forEach(anchor => {
+        var oldElement = anchor
+        var newElement = oldElement.cloneNode(true);
+        oldElement.parentNode.replaceChild(newElement, oldElement);
 
+        newElement.addEventListener('click', (event) => {
+            event.preventDefault()
+            event.stopPropagation();
+
+            console.log("Nhan dep zai");
+
+            document.getElementById("nsd-search-panel").style.cssText += `
+              height: 100vh;
+              width: 100vw;
+              z-index: 99999;
+            `;
+        });
+    });
+
+}
 
 window.findProductContainer = function () {
     var liElements = document.querySelectorAll('li');

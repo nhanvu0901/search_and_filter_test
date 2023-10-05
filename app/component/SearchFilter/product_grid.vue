@@ -1,5 +1,5 @@
 <template>
-    <div v-html="generateGrid()"></div>
+    <div v-if="product_list !== []" v-html="generateGrid()"></div>
 
     <!--    <div class="product-grid-container" id="ProductGridContainer">-->
     <!--        <div class="collection page-width">-->
@@ -172,7 +172,7 @@ export default {
         },
         generateGrid() {
             let div_main = document.createElement('div')
-            div_main.id = 'nds-main-grid'
+            div_main.className = 'nds-main-grid'
             let data_theme = window.data_theme
             let generate_contain_class = document.createElement(JSON.parse(data_theme.contain_class).type)
             let attributesArray = JSON.parse(data_theme.contain_class).class

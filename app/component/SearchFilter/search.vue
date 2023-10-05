@@ -5,9 +5,8 @@
                    v-model:value="search_query_product"
                    placeholder="Search by product name"
 
-                   @input="searchProduct"
-            >
-                <template #prefix>
+                   @input="searchProduct">
+                <template #suffix>
                     <SearchOutlined/>
                 </template>
             </Input>
@@ -15,8 +14,13 @@
                 <path d="M18 6L6 18M6 6L18 18" stroke="black" stroke-width="2" stroke-linecap="round"
                       stroke-linejoin="round"/>
             </svg>
-
         </div>
+
+<!--        <div class="product_list" v-if="product_list !== []" style="display: grid;grid-template-columns: repeat(3, 1fr)">-->
+<!--            <div v-for="product in product_list">-->
+<!--                <img>-->
+<!--            </div>-->
+<!--        </div>-->
     </div>
 
 </template>
@@ -24,9 +28,13 @@
 
 import {Input} from "ant-design-vue";
 import {SearchOutlined} from "@ant-design/icons-vue";
+import ProductGrid from "./product_grid.vue";
 </script>
 <script>
 
+
+import _ from "lodash";
+import axios from "axios";
 
 export default {
     name: "Search",
@@ -35,17 +43,38 @@ export default {
     props: {},
     data() {
         return {
-            search_query_product: null
+            search_query_product: null,
+            product_list:[]
         }
     },
     watch: {},
     methods: {
         searchProduct() {
-            console.log("Nhan gioi")
+            this.getProductLink()
         },
         closeSearchPenal(){
             document.getElementById('nsd-search-panel').style.height ="0"
-        }
+        },
+        getProductLink: _.debounce(
+            function () {
+                var self = this
+
+                axios.post('/apps/nestbundle/products_search', {
+                    jsonrpc: "2.0",
+                    params: {
+                        store_url:Shopify.shop,
+                        limit: 20,
+                        query: this.search_query_product
+                    }
+                }).then(response => {
+                    self.product_list = JSON.parse(response.data.result)
+                    console.log(self.product_list)
+                }).catch(function (error) {
+
+                    console.log(error)
+                });
+            }, 500
+        ),
     },
 
     mounted() {
