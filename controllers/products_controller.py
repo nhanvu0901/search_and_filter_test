@@ -4,7 +4,7 @@ import shopify
 import logging
 from odoo import http
 from odoo.http import request
-import math
+import requests
 from array import array
 from urllib import parse
 import time
@@ -490,10 +490,14 @@ class NestBundleProductController(http.Controller):
                 'list_attribute': kw.get('list_attribute')
             }
 
-    @http.route('/nb/products_search',auth='public', type='json', method=['POST'], csrf=False, cors="*")
+
+
+
+
+    @http.route('/nb/products_search/<string:mode>', methods=['POST'], type='json', auth='public')
     def search_product(self, **kw):
         try:
-
+            verify_request()
             current_store = request.env['nb.shopify.store'].sudo().search(
                 [("store_url", '=', kw['store_url'])], limit=1)
             if current_store:
@@ -501,15 +505,61 @@ class NestBundleProductController(http.Controller):
                 search_query = kw['query']
                 limit = 12
 
+                # headers = {
+                #     "Content-Type": "application/json",
+                #     "X-Shopify-Access-Token": "shpua_b2bb86a3d00c64fa67f8d68ccb62b374"
+                # }
+                #
+                # # Create the mutation
+                # mutation = """
+                # mutation {
+                #   storefrontAccessTokenCreate(input: { title: "store-front-search" }) {
+                #     storefrontAccessToken {
+                #       id
+                #       accessToken
+                #       accessScopes {
+                #         handle
+                #       }
+                #     }
+                #     userErrors {
+                #       field
+                #       message
+                #     }
+                #   }
+                # }
+                # """
+                #
+                # # Replace "your-title" with the title you want to give to the token
+                #
+                # # Send the request
+                # url = "https://instafeed-mint.myshopify.com/admin/api/2023-10/graphql.json"
+                # response = requests.post(url, json={'query': mutation}, headers=headers)
+                #
+                # # Parse the response
+                # data = json.loads(response.text)
+                #
+                # # Handle the response
+                # if data["data"]["storefrontAccessTokenCreate"]["userErrors"]:
+                #     print("Error:", data["data"]["storefrontAccessTokenCreate"]["userErrors"])
+                # else:
+                #     print("Access Token:",
+                #           data["data"]["storefrontAccessTokenCreate"]["storefrontAccessToken"]["accessToken"])
+                #     storefrontAccessToken = data["data"]["storefrontAccessTokenCreate"]["storefrontAccessToken"][
+                #         "accessToken"]
+                #     current_store.sudo().write({
+                #         "store_front_api": storefrontAccessToken
+                #     })
+
                 while True:
-                    query = ('{products(first: %d, query: "title:%s* AND status:ACTIVE") {'
-                           
-                             'edges {node {id title '
-                             'collections(first: 5) { nodes  {title}}'
-                             'options(first: 4) { id name values } '
-                             'variants(first: 5) { nodes {id availableForSale sku compareAtPrice price title image {url} }}'
-                             ' title handle createdAt productType tags vendor images(first: 1) {edges { node {originalSrc}}}}}}}') % (
-                                limit, search_query)
+                    # query = ('{products(first: %d, query: "title:%s* AND status:ACTIVE") {'
+                    #
+                    #          'edges {node {id title '
+                    #          'collections(first: 5) { nodes  {title}}'
+                    #          'options(first: 4) { id name values } '
+                    #          'variants(first: 5) { nodes {id availableForSale sku compareAtPrice price title image {url} }}'
+                    #          ' title handle createdAt productType tags vendor images(first: 1) {edges { node {originalSrc}}}}}}}') % (
+                    #             limit, search_query)
+                    query = ('{shop {storefrontAccessTokens(first: 5) {edges {node {id title accessToken}}}}}')
                     query_result = shopify.GraphQL().execute(query=query)
                     query_result = json.loads(query_result)
                     product_options = []

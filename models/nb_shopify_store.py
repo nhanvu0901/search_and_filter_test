@@ -46,6 +46,7 @@ class NestBundleShopifyStore(models.Model):
     filter_option = fields.Char()
 
     theme_id = fields.One2many("theme.store", "shopify_store")
+    store_front_api = fields.Char()
 
     def register_webhook(self):
         try:

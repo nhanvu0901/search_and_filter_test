@@ -10,17 +10,18 @@
                     <SearchOutlined/>
                 </template>
             </Input>
-            <svg @click="closeSearchPenal" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <svg @click="closeSearchPenal" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                 xmlns="http://www.w3.org/2000/svg">
                 <path d="M18 6L6 18M6 6L18 18" stroke="black" stroke-width="2" stroke-linecap="round"
                       stroke-linejoin="round"/>
             </svg>
         </div>
 
-<!--        <div class="product_list" v-if="product_list !== []" style="display: grid;grid-template-columns: repeat(3, 1fr)">-->
-<!--            <div v-for="product in product_list">-->
-<!--                <img>-->
-<!--            </div>-->
-<!--        </div>-->
+        <!--        <div class="product_list" v-if="product_list !== []" style="display: grid;grid-template-columns: repeat(3, 1fr)">-->
+        <!--            <div v-for="product in product_list">-->
+        <!--                <img>-->
+        <!--            </div>-->
+        <!--        </div>-->
     </div>
 
 </template>
@@ -44,7 +45,7 @@ export default {
     data() {
         return {
             search_query_product: null,
-            product_list:[]
+            product_list: []
         }
     },
     watch: {},
@@ -52,27 +53,57 @@ export default {
         searchProduct() {
             this.getProductLink()
         },
-        closeSearchPenal(){
-            document.getElementById('nsd-search-panel').style.height ="0"
+        closeSearchPenal() {
+            document.getElementById('nsd-search-panel').style.height = "0"
         },
         getProductLink: _.debounce(
             function () {
                 var self = this
+                const url = 'https://https://instafeed-mint.myshopify.com/api/2023-04/graphql.json';
+                const storefrontAccessToken = 'd88b4bf05ea3a67195ef02894ef3590e';  // replace with your actual token
+                const query ='{"query  {predictiveSearch(query: "a", limit: 10) {products {title}queries {text}}}}'
 
-                axios.post('/apps/nestbundle/products_search', {
-                    jsonrpc: "2.0",
-                    params: {
-                        store_url:Shopify.shop,
-                        limit: 20,
-                        query: this.search_query_product
-                    }
-                }).then(response => {
-                    self.product_list = JSON.parse(response.data.result)
-                    console.log(self.product_list)
-                }).catch(function (error) {
+                fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Shopify-Storefront-Access-Token': storefrontAccessToken
+                    },
+                    body: JSON.stringify(query)
+                })
+                    .then(response => {
+                        console.log(`Response status: ${response.status}`);
+                        return response
+                    })
+                    .then(data => console.log(data))
+                    .catch(error => console.error('Error:', error));
+                // axios.post('https://' + Shopify.shop + '/api/2023-04/graphql.json', {
+                //     jsonrpc: "2.0",
+                //     params: {
+                //         method: "POST",
+                //         headers: headers,
+                //         body: JSON.stringify({query: query})
+                //     }
+                // }).then(response => {
+                //     console.log(response)
+                // }).catch(function (error) {
+                //     console.log(error)
+                // });
 
-                    console.log(error)
-                });
+                // axios.post('/apps/nestbundle/products_search', {
+                //     jsonrpc: "2.0",
+                //     params: {
+                //         store_url:Shopify.shop,
+                //         limit: 20,
+                //         query: this.search_query_product
+                //     }
+                // }).then(response => {
+                //     self.product_list = JSON.parse(response.data.result)
+                //     console.log(self.product_list)
+                // }).catch(function (error) {
+                //
+                //     console.log(error)
+                // });
             }, 500
         ),
     },
@@ -86,9 +117,11 @@ export default {
 .search-bg {
 
 }
-.nb-input{
+
+.nb-input {
     width: 65% !important;
 }
+
 .search-container {
     display: flex;
     height: 66px;
