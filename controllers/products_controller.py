@@ -9,8 +9,7 @@ from array import array
 from urllib import parse
 import time
 from .auth import verify_request
-import re
-from bs4 import BeautifulSoup
+import requests
 
 _logger = logging.getLogger(__name__)
 
@@ -490,14 +489,10 @@ class NestBundleProductController(http.Controller):
                 'list_attribute': kw.get('list_attribute')
             }
 
-
-
-
-
-    @http.route('/nb/products_search/<string:mode>', methods=['POST'], type='json', auth='public')
+    @http.route('/nb/products_search', auth='public', type='json', method=['POST'], csrf=False, cors="*")
     def search_product(self, **kw):
         try:
-            verify_request()
+
             current_store = request.env['nb.shopify.store'].sudo().search(
                 [("store_url", '=', kw['store_url'])], limit=1)
             if current_store:
@@ -549,76 +544,92 @@ class NestBundleProductController(http.Controller):
                 #     current_store.sudo().write({
                 #         "store_front_api": storefrontAccessToken
                 #     })
+                limit = 10
+                # Define the query as a string
+                query = ('{predictiveSearch(query: "%s", types: QUERY, limit: %d) {'
+                         'queries {text}}'
+                         'search(query: "%s", first: %d) {'
+                         'nodes {'
+                         '... on Product {'
+                         'variants(first: 2) {'
+                         'nodes {'
+                         'price {amount}'
+                         'image {originalSrc}'
+                         'title}} '
+                         'title '
+                         'availableForSale '
+                         'handle '
+                         'productType '
+                         'images(first: 1) {'
+                         'nodes {'
+                         'originalSrc}}}}}}') % (
+                            search_query, limit, search_query, limit)
 
-                while True:
-                    # query = ('{products(first: %d, query: "title:%s* AND status:ACTIVE") {'
-                    #
-                    #          'edges {node {id title '
-                    #          'collections(first: 5) { nodes  {title}}'
-                    #          'options(first: 4) { id name values } '
-                    #          'variants(first: 5) { nodes {id availableForSale sku compareAtPrice price title image {url} }}'
-                    #          ' title handle createdAt productType tags vendor images(first: 1) {edges { node {originalSrc}}}}}}}') % (
-                    #             limit, search_query)
-                    query = ('{shop {storefrontAccessTokens(first: 5) {edges {node {id title accessToken}}}}}')
-                    query_result = shopify.GraphQL().execute(query=query)
-                    query_result = json.loads(query_result)
+                # Define the URL
+                url = 'https://instafeed-mint.myshopify.com/api/2023-10/graphql.json'
+
+                # Define the headers
+                headers = {
+                    'Content-Type': 'application/json',
+                    'X-Shopify-Storefront-Access-Token': '7e0a7584019eadeaf4d4da7e88febdef'
+                }
+
+                # Define the data
+                data = {
+                    'query': query
+                }
+                try:
+                    # Make the POST request
+                    response = requests.post(url, headers=headers, json=data)
                     product_options = []
-                    if query_result:
-                        try:
-                            if 'data' in query_result:
-                                if 'products' in query_result['data'] and query_result['data']['products'][
-                                    'edges'] != []:
-                                    for product in query_result['data']['products']['edges']:
-                                        data = product['node']
-                                        if not data['images']['edges']:
-                                            data['images']['edges'].append({
-                                                'node': {
-                                                    'originalSrc': 'https://apps.nestscale.com/omnichat/static/img/no_image.png'
-                                                }
-                                            })
-                                        variant_list = []
-                                        not_available = 0
-                                        for data_variant in data['variants'].get('nodes'):
-                                            variant_data = {
-                                                "available": data_variant.get("availableForSale"),
-                                                "id": data_variant['id'].split('/')[-1],
-                                                # "inventory_policy": data_variant.get("inventoryPolicy"),
-                                                "compare_at_price": data_variant.get("compareAtPrice"),
-                                                'price': float(data_variant.get('price')),
-                                                # "selected_options": data_variant.get("selectedOptions"),
-                                                "title": data_variant.get('title'),
-                                                "url": data_variant.get('image').get('url') if data_variant.get(
-                                                    'image') != None else None
-                                                # "weight": data_variant.get("weight"),
-                                                # "weight_unit": data_variant.get("weightUnit"),
-                                            }
+                    if 'data' in response.json():
+                        if 'search' and 'predictiveSearch' in response.json().get('data'):
+                            query_result = response.json().get('data').get('search').get('nodes')
+                            for product in query_result:
+                                data = product
+                                if not data['images']['nodes']:
+                                    data['images']['nodes'].append(
+                                        {
+                                            'originalSrc': 'https://apps.nestscale.com/omnichat/static/img/no_image.png'
+                                        }
+                                    )
+                                variant_list = []
+                                not_available = 0
+                                for data_variant in data['variants']['nodes']:
+                                    variant_data = {
 
-                                            variant_list.append(variant_data)
-                                        product_options.append({
-                                            "available": False if not_available == len(variant_list) else True,
-                                            "collections": data['collections']['nodes'],
-                                            "created_at": data['createdAt'],
-                                            'id': data['id'].split("/")[-1],
-                                            'img_src': data['images']['edges'][0]['node'][
-                                                'originalSrc'] if 'images' in data else None,
-                                            "options": data['options'],
-                                            "product_type": data['productType'],
-                                            'title': data['title'],
-                                            "handle": data['handle'],
-                                            # 'product_url': data['onlineStorePreviewUrl'],
-                                            "tags": data['tags'],
-                                            "variants": variant_list,
-                                            "vendor": data['vendor']
-                                        })
-                                return json.dumps(product_options)
+                                        'price': float(data_variant['price']['amount']),
+                                        "title": data_variant['title'],
+                                        "url": data_variant['image']['originalSrc'] if data_variant[
+                                                                                           'image'] != None else None
+                                    }
 
-                        except Exception as e:
-                            _logger.error(traceback.format_exc())
-                            if str(e) == "Time out!":
-                                return {
-                                    'code': -1,
-                                    'error': str(e)
-                                }
+                                    variant_list.append(variant_data)
+                                product_options.append({
+                                    "available": data['availableForSale'],
+
+                                    'img_src': data['images']['nodes'][0]['originalSrc'] if 'images' in data else None,
+                                    "product_type": data['productType'],
+                                    'title': data['title'],
+                                    "handle": data['handle'],
+                                    "variants": variant_list,
+
+                                })
+                            return json.dumps({
+                                "product_options":product_options,
+                                "predictiveSearch":response.json().get('data')['predictiveSearch']
+                            })
+
+
+                except Exception as e:
+                    _logger.error(traceback.format_exc())
+                    if str(e) == "Time out!":
+                        return {
+                            'code': -1,
+                            'error': str(e)
+                        }
+
+
 
             else:
                 return {

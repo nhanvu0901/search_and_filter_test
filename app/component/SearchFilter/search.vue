@@ -58,52 +58,41 @@ export default {
         },
         getProductLink: _.debounce(
             function () {
-                var self = this
-                const url = 'https://https://instafeed-mint.myshopify.com/api/2023-04/graphql.json';
-                const storefrontAccessToken = 'd88b4bf05ea3a67195ef02894ef3590e';  // replace with your actual token
-                const query ='{"query  {predictiveSearch(query: "a", limit: 10) {products {title}queries {text}}}}'
-
-                fetch(url, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-Shopify-Storefront-Access-Token': storefrontAccessToken
-                    },
-                    body: JSON.stringify(query)
-                })
-                    .then(response => {
-                        console.log(`Response status: ${response.status}`);
-                        return response
-                    })
-                    .then(data => console.log(data))
-                    .catch(error => console.error('Error:', error));
-                // axios.post('https://' + Shopify.shop + '/api/2023-04/graphql.json', {
-                //     jsonrpc: "2.0",
-                //     params: {
-                //         method: "POST",
-                //         headers: headers,
-                //         body: JSON.stringify({query: query})
-                //     }
-                // }).then(response => {
-                //     console.log(response)
-                // }).catch(function (error) {
-                //     console.log(error)
-                // });
-
-                // axios.post('/apps/nestbundle/products_search', {
-                //     jsonrpc: "2.0",
-                //     params: {
-                //         store_url:Shopify.shop,
-                //         limit: 20,
-                //         query: this.search_query_product
-                //     }
-                // }).then(response => {
-                //     self.product_list = JSON.parse(response.data.result)
-                //     console.log(self.product_list)
-                // }).catch(function (error) {
+                // var self = this
+                // const url = 'https://https://instafeed-mint.myshopify.com/api/2023-04/graphql.json';
+                // const storefrontAccessToken = 'd88b4bf05ea3a67195ef02894ef3590e';  // replace with your actual token
+                // const query ='{"query  {predictiveSearch(query: "a", limit: 10) {products {title}queries {text}}}}'
                 //
-                //     console.log(error)
-                // });
+                // fetch(url, {
+                //     method: 'POST',
+                //     headers: {
+                //         'Content-Type': 'application/json',
+                //         'X-Shopify-Storefront-Access-Token': storefrontAccessToken
+                //     },
+                //     body: JSON.stringify(query)
+                // })
+                //     .then(response => {
+                //         console.log(`Response status: ${response.status}`);
+                //         return response
+                //     })
+                //     .then(data => console.log(data))
+                //     .catch(error => console.error('Error:', error));
+
+
+                axios.post('/apps/nestbundle/products_search', {
+                    jsonrpc: "2.0",
+                    params: {
+                        store_url:Shopify.shop,
+                        limit: 20,
+                        query: this.search_query_product
+                    }
+                }).then(response => {
+                    self.product_list = JSON.parse(response.data.result).product_options
+                    console.log(self.product_list)
+                }).catch(function (error) {
+
+                    console.log(error)
+                });
             }, 500
         ),
     },
